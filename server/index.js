@@ -17,18 +17,24 @@ mongoose.connect(process.env.MONGO_URI,{
 .then(()=>console.log("DB connected")).catch(err=>console.log("DB connection error", err));
 
 // Middleware
-app.use(express.json()); // Parse JSON bodies
-app.use(cors()); // Enable CORS
+app.use(express.json()); 
+const corsOptions = {
+    origin: 'http://localhost:3000', 
+    credentials: true, 
+};
 
-// Basic route
-app.get('/', (req, res) => {
-    res.send('Welcome to the Node.js server!');
-});
+app.use(cors(corsOptions));
 
-const testRoutes = require(('./routes/test'));
-app.use("/",testRoutes);
+const testRoutes = require(('./routes/test'))
+const authRoutes = require(('./routes/authRouter'))
+const meetingRoutes = require(('./routes/meetingsRouter'))
+const companyRoutes = require(('./routes/companyRouter'))
+app.use("/", testRoutes)
+app.use("/", authRoutes)
+app.use("/", meetingRoutes)
+app.use("/", companyRoutes)
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`)
 });
