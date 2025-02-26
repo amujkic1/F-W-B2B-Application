@@ -1,7 +1,7 @@
 function Contact() {
     return(
         <>
-            <section id="contact" class="contact">
+            <section id="contact" class="contact" style={{marginTop: "80px"}}>
             <div class="container" data-aos="fade-up">
 
                 <div class="section-title">

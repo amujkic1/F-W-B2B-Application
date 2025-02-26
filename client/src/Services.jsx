@@ -2,7 +2,7 @@ function Services() {
     return(
         <>
             <section id="services" class="services section-bg">
-            <div class="container" data-aos="fade-up">
+            <div class="container" data-aos="fade-up" style={{marginTop: "80px"}}>
 
                 <div class="section-title">
                 <h2>Services</h2>

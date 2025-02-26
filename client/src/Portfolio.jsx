@@ -1,7 +1,7 @@
 function Portfolio(){
     return(
         <>
-            <section id="portfolio" class="portfolio">
+            <section id="portfolio" class="portfolio" style={{marginTop: "80px"}}>
             <div class="container" data-aos="fade-up">
 
                 <div class="section-title">

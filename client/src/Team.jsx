@@ -1,7 +1,7 @@
 function Team() {
     return(
         <>
-            <section id="team" class="team section-bg">
+            <section id="team" class="team section-bg" style={{marginTop: "80px"}}>
             <div class="container" data-aos="fade-up">
 
                 <div class="section-title">
