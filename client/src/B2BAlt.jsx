@@ -1,4 +1,6 @@
+import { FaCalendarAlt } from "react-icons/fa";
 import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 function B2BAlt(){
     
@@ -8,7 +10,7 @@ function B2BAlt(){
                 <div class="container-sm py-5 h-100 mt-5">
                     <div class="row justify-content-center">
                         <div class="col-sm-4 border p-4 rounded shadow-lg"> 
-                        <h2 class="mb-3 text-center">Prijava</h2>
+                        <h2 class="mb-3 text-center">Zakažite sastanak</h2>
                             <form onSubmit={(e) => { e.preventDefault(); }}>
                                 <div className="row">
                                     <div className="col12 mb-2">
@@ -37,6 +39,7 @@ function B2BAlt(){
                                             className="form-control w-100 rounded shadow-sm border-primary"
                                             withPortal
                                         />
+                                        <FaCalendarAlt className="position-absolute end-0 me-3 top-50 translate-middle-y text-primary" />
                                     </div>
                                     </div>
 

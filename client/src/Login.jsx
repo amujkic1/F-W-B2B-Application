@@ -25,6 +25,7 @@ function Login() {
                 Cookies.set('token', token)
                 findCompanyByEmail()
                 navigate('/')
+                window.location.reload()
             }else{
                 return response.json().then(data => {
                     throw new Error(data.error);

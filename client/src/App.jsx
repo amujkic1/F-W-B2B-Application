@@ -15,6 +15,8 @@ import Team from "./Team.jsx"
 import Contact from "./Contact.jsx"
 import B2BAlt from "./B2BAlt.jsx"
 import CardContainer from "./Card.jsx"
+import Profile from "./Profile.jsx"
+import Agenda from "./Agenda.jsx"
 
 function App() {
 /*
@@ -35,6 +37,8 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/companies" element={<CardContainer/>}/>
+        <Route path="/profile" element={<Profile/>}/>
+        <Route path="/agenda" element={<Agenda/>}/>
         <Route element={<ProtectedRoute />}>
           <Route path="/b2b" element={<B2BAlt />} />
         </Route>

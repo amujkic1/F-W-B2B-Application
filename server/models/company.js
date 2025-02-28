@@ -33,6 +33,14 @@ const companySchema = new Schema({
     password: {
         type: String,
         required: true,
+    },
+    website: {
+        type: String,
+        required: false,
+    },
+    logo_img: {
+        type: String,
+        required: false,
     }
 })
 

@@ -1,37 +1,71 @@
-function CardContainer() {
+import { useState, useEffect } from "react";
 
-    const cards = Array(8).fill({
-        title: "Card title",
-        text: "Some quick example text to build on the card title and make up the bulk of the card's content.",
-        imgSrc: "../assets/img/skills.png",
-    });
+function CardContainer() {
+    const [companies, setCompanies] = useState([]);
+
+    useEffect(() => {
+        fetchCompanies();
+    }, []);
+
+    const fetchCompanies = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/companies', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error);
+            }
+
+            const data = await response.json();
+            console.log('data', data)
+            setCompanies(data.companies);
+            console.log(companies)
+        } catch (err) {
+            console.error('Greška prilikom dohvatanja kompanija: ', err);
+        }
+    };
 
     return (
         <>
-        <div class="section-title" style={{marginTop: "130px"}}>
-            <h2>Baza kompanija</h2>
-        </div>
+            <div className="section-title" style={{ marginTop: "130px" }}>
+                <h2>Baza kompanija</h2>
+            </div>
 
-        <div style={{
-            display: "flex",
-            flexWrap: "wrap",  
-            gap: "20px",
-            justifyContent: "center", 
-            padding: "20px",
-            marginTop: "20px"
-        }}>
-            {cards.map((card, index) => (
-                <div key={index} className="card" style={{ width: "20rem", marginTop: "20px" }}>
-                    <img src={card.imgSrc} className="card-img-top" alt="..." />
-                    <div className="card-body">
-                        <h5 className="card-title">{card.title}</h5>
-                        <p className="card-text">{card.text}</p>
-                        <a href="#" className="btn btn-primary">Go somewhere</a>
+            <div style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "20px",
+                justifyContent: "center",
+                padding: "20px",
+                marginTop: "20px"
+            }}>
+                {companies.map((company, index) => (
+                    <div key={index} className="card company-card" style={{ width: "20rem", marginTop: "20px" }}>
+                        <img src={company.imgSrc || "../assets/img/skills.png"} className="card-img-top" alt={company.name} />
+                        <div className="card-body">
+                            <h5 className="card-title">{company.company}</h5>
+                            {company.officialEmail && (
+                                <p className="card-text">
+                                    <i className="bi bi-envelope-fill"></i> {company.officialEmail}
+                                </p>
+                            )}
+
+                            {company.phone && (
+                                <p className="card-text">
+                                    <i className="bi bi-telephone-fill"></i> {company.phone}
+                                </p>
+                            )}
+                            <a href={company.website || "#"} className="btn btn-primary" target="_blank" rel="noopener noreferrer">Posjeti</a>
+                        </div>
                     </div>
-                </div>
-            ))}
-        </div>
-
+                ))}
+            </div>
         </>
     );
 }
