@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Cookies from 'js-cookie'
 
 function Profile() {
@@ -9,6 +9,10 @@ function Profile() {
     const [phone, setPhone] = useState('')
     const [image, setImage] = useState('')
 
+    useEffect(() => {
+        findCompanyByEmail();
+    }, []);
+
     const findCompanyByEmail = () => {
             fetch('http://localhost:5000/company', {
                 method: 'POST',
@@ -16,12 +20,15 @@ function Profile() {
                   'Content-Type': 'application/json'
                 },
                 credentials: 'include',
-                body: JSON.stringify({ email })
+                body: JSON.stringify({ email: Cookies.get('email') })
             })
             .then(async response => {
                 if(response.ok){
-                    const { company } = await response.json()
-                    Cookies.set('company', company.company)
+                    const data = await response.json()
+                    setCompany(data.company.company || '');
+                    setEmail(data.company.email || '');
+                    setAddress(data.company.address || '');
+                    setPhone(data.company.phone || '');
                 }else{
                     return response.json().then(data => {
                         throw new Error(data.error)
@@ -51,7 +58,7 @@ function Profile() {
                                         <i className="fas fa-camera"></i>
                                     </button>
                                 </div>
-                                <h3 className="mt-3 mb-1">Alex Johnson</h3>
+                                <h3 className="mt-3 mb-1">{company}</h3>
                                 <p className="text-muted mb-3">Senior Product Designer</p>
                                 <div className="d-flex justify-content-center gap-2 mb-4">
                                     <button className="btn btn-outline-primary"><i className="fas fa-envelope me-2"></i>Message</button>
@@ -104,52 +111,6 @@ function Profile() {
                                                     </div>
                                                 </div>
 
-                                                <div className="row g-4 mb-4">
-                                                    <div className="col-md-6">
-                                                        <div className="settings-card card">
-                                                            <div className="card-body">
-                                                                <div className="d-flex justify-content-between align-items-center">
-                                                                    <div>
-                                                                        <h6 className="mb-1">Two-Factor Authentication</h6>
-                                                                        <p className="text-muted mb-0 small">Add an extra layer of security</p>
-                                                                    </div>
-                                                                    <div className="form-check form-switch">
-                                                                        <input className="form-check-input" type="checkbox" checked readOnly />
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-6">
-                                                        <div className="settings-card card">
-                                                            <div className="card-body">
-                                                                <div className="d-flex justify-content-between align-items-center">
-                                                                    <div>
-                                                                        <h6 className="mb-1">Email Notifications</h6>
-                                                                        <p className="text-muted mb-0 small">Receive activity updates</p>
-                                                                    </div>
-                                                                    <div className="form-check form-switch">
-                                                                        <input className="form-check-input" type="checkbox" checked readOnly />
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div>
-                                                    <h5 className="mb-4">Recent Activity</h5>
-                                                    {[
-                                                        { action: "Updated profile picture", time: "2 hours ago" },
-                                                        { action: "Changed password", time: "Yesterday" },
-                                                        { action: "Updated billing information", time: "3 days ago" }
-                                                    ].map((activity, index) => (
-                                                        <div className="activity-item mb-3" key={index}>
-                                                            <h6 className="mb-1">{activity.action}</h6>
-                                                            <p className="text-muted small mb-0">{activity.time}</p>
-                                                        </div>
-                                                    ))}
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
