@@ -25,7 +25,7 @@ function Header() {
 
                 <nav id="navbar" className="navbar">
                     <ul>
-                        <li><a className="nav-link scrollto active" href="/">Home</a></li>
+                        <li><a className="nav-link scrollto active" href="/">Naslovna</a></li>
                         <li><a className="nav-link scrollto" href="/services">Izlagači</a></li>
                         <li><a className="nav-link scrollto" href="/portfolio">Galerija</a></li>
                         <li><a className="nav-link scrollto" href="/team">Team</a></li>
