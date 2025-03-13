@@ -17,6 +17,7 @@ import B2BAlt from "./B2BAlt.jsx"
 import CardContainer from "./Card.jsx"
 import Profile from "./Profile.jsx"
 import Agenda from "./Agenda.jsx"
+import Firebase from "./Firebase.jsx"
 
 function App() {
 /*
@@ -39,6 +40,7 @@ function App() {
         <Route path="/companies" element={<CardContainer/>}/>
         <Route path="/profile" element={<Profile/>}/>
         <Route path="/agenda" element={<Agenda/>}/>
+        <Route path="/firebase" element={<Firebase/>}/>
         <Route element={<ProtectedRoute />}>
           <Route path="/b2b" element={<B2BAlt />} />
         </Route>
