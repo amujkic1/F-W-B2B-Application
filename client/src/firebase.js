@@ -12,9 +12,6 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID
 };
 
-// Log the Firebase config to the console to check if it's loaded correctly
-console.log("Firebase Configuration:", firebaseConfig);
-
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const storage = getStorage(app);
