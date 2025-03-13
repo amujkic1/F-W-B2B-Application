@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 
 async function register(req, res) {
     
-    const { company, id, name, address, phone, officialEmail, registrationEmail, password } = req.body;
+    const { company, id, name, address, phone, officialEmail, registrationEmail, password, imageUrl } = req.body;
 
     try{
         console.log(req.body)
@@ -21,7 +21,8 @@ async function register(req, res) {
             phone: phone,
             officialEmail: officialEmail,
             registrationEmail: registrationEmail,
-            password: hashedPassword
+            password: hashedPassword,
+            image: imageUrl
         })
         console.log(newCompany)
 
@@ -57,6 +58,7 @@ async function login(req,res){
         return res.status(500).json({ error: 'Greška prilikom prijave', err_code: err });
     }
 }
+
 
 module.exports = {
     register,

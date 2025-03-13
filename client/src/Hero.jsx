@@ -15,8 +15,7 @@ function Hero(){
                     </div>
                     </div>
                     <div class="col-lg-6 order-1 order-lg-2 hero-img d-none d-lg-block" data-aos="zoom-in" data-aos-delay="200">
-                    {/*<img src="assets/banner.jpg" class="img-fluid animated" alt=""/>*/}
-                    <img src="assets/banner3.png"  alt=""/>
+                    <img src="assets/banner3.png" className="h-100"  alt=""/>
                     </div>
                 </div>
             </div>

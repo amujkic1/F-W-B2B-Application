@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { storage } from "./firebase";
+import { ref, getDownloadURL } from "firebase/storage";
 
 function CardContainer() {
     const [companies, setCompanies] = useState([]);
@@ -9,12 +11,12 @@ function CardContainer() {
 
     const fetchCompanies = async () => {
         try {
-            const response = await fetch('http://localhost:5000/companies', {
-                method: 'GET',
+            const response = await fetch("http://localhost:5000/companies", {
+                method: "GET",
                 headers: {
-                    'Content-Type': 'application/json'
+                    "Content-Type": "application/json"
                 },
-                credentials: 'include'
+                credentials: "include"
             });
 
             if (!response.ok) {
@@ -23,11 +25,26 @@ function CardContainer() {
             }
 
             const data = await response.json();
-            console.log('data', data)
-            setCompanies(data.companies);
-            console.log(companies)
+
+            // Obrada slika iz Firebase Storage-a
+            const updatedCompanies = await Promise.all(
+                data.companies.map(async (company) => {
+                    if (company.image) {
+                        try {
+                            const imageUrl = await getDownloadURL(ref(storage, company.image));
+                            return { ...company, imageUrl };
+                        } catch (error) {
+                            console.error("Greška pri dohvaćanju slike: ", error);
+                            return { ...company, imageUrl: "../assets/img/skills.png" };
+                        }
+                    }
+                    return { ...company, imageUrl: "../assets/img/skills.png" };
+                })
+            );
+
+            setCompanies(updatedCompanies);
         } catch (err) {
-            console.error('Greška prilikom dohvatanja kompanija: ', err);
+            console.error("Greška prilikom dohvatanja kompanija: ", err);
         }
     };
 
@@ -37,17 +54,19 @@ function CardContainer() {
                 <h2>Baza kompanija</h2>
             </div>
 
-            <div style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "20px",
-                justifyContent: "center",
-                padding: "20px",
-                marginTop: "20px"
-            }}>
+            <div
+                style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "20px",
+                    justifyContent: "center",
+                    padding: "20px",
+                    marginTop: "20px"
+                }}
+            >
                 {companies.map((company, index) => (
                     <div key={index} className="card company-card" style={{ width: "20rem", marginTop: "20px" }}>
-                        <img src={company.imgSrc || "../assets/img/skills.png"} className="card-img-top" alt={company.name} />
+                        <img src={company.imageUrl} className="card-img-top" alt={company.name} />
                         <div className="card-body">
                             <h5 className="card-title">{company.company}</h5>
                             {company.officialEmail && (
@@ -61,7 +80,9 @@ function CardContainer() {
                                     <i className="bi bi-telephone-fill"></i> {company.phone}
                                 </p>
                             )}
-                            <a href={company.website || "#"} className="btn btn-primary" target="_blank" rel="noopener noreferrer">Posjeti</a>
+                            <a href={company.website || "#"} className="btn btn-primary" target="_blank" rel="noopener noreferrer">
+                                Posjeti
+                            </a>
                         </div>
                     </div>
                 ))}

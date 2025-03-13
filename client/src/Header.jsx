@@ -28,7 +28,7 @@ function Header() {
                         <li><a className="nav-link scrollto active" href="/">Naslovna</a></li>
                         <li><a className="nav-link scrollto" href="/services">Izlagači</a></li>
                         <li><a className="nav-link scrollto" href="/portfolio">Galerija</a></li>
-                        <li><a className="nav-link scrollto" href="/team">Team</a></li>
+                        <li><a className="nav-link scrollto" href="/team">Govornici</a></li>
                         <li className="dropdown">
                             <a href="/b2b" style={{ textDecoration: "none" }}>
                                 <span>B2B</span> <i className="bi bi-chevron-down"></i>

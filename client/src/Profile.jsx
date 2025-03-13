@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Cookies from 'js-cookie'
+import { storage } from './firebase'
+import { ref, getDownloadURL } from 'firebase/storage'
+
 
 function Profile() {
 
@@ -29,6 +32,14 @@ function Profile() {
                     setEmail(data.company.email || '');
                     setAddress(data.company.address || '');
                     setPhone(data.company.phone || '');
+                    
+                    if (data.company.image) {
+                        const imageRef = ref(storage, data.company.image);
+                        getDownloadURL(imageRef)
+                            .then(url => setImage(url))
+                            .catch(error => console.error("Greška pri dohvaćanju slike:", error));
+                    }
+
                 }else{
                     return response.json().then(data => {
                         throw new Error(data.error)
@@ -53,10 +64,7 @@ function Profile() {
                             </div>
                             <div className="text-center">
                                 <div className="position-relative d-inline-block">
-                                    <img src="../assets/zir.png" className="rounded-circle profile-pic" alt="Profile" />
-                                    <button className="btn btn-primary btn-sm position-absolute bottom-0 end-0 rounded-circle">
-                                        <i className="fas fa-camera"></i>
-                                    </button>
+                                    <img src={ image || "../assets/blank.png"} className="rounded-circle profile-pic w-50" alt="Profile" />
                                 </div>
                                 <h3 className="mt-3 mb-1">{company}</h3>
                                 <p className="text-muted mb-3">Senior Product Designer</p>
