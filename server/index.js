@@ -18,8 +18,16 @@ mongoose.connect(process.env.MONGO_URI,{
 
 // Middleware
 app.use(express.json()); 
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:5173'];
 const corsOptions = {
-    origin: 'http://localhost:3000', 
+    origin: (origin, callback) => {
+        // Allow server-to-server and tool requests that do not send an Origin header.
+        if (!origin || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true, 
 };
 
