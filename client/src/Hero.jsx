@@ -1,27 +1,42 @@
-function Hero(){
+function Hero() {
+    return (
+        <section id='hero' className='relative overflow-hidden bg-gradient-to-b from-slate-100 to-white pt-28 sm:pt-32'>
+            <div className='mx-auto w-full max-w-7xl px-4 pb-16 sm:px-6 lg:px-8'>
+                <div className='flex max-w-3xl flex-col justify-center gap-5 text-left' data-aos='fade-up' data-aos-delay='200'>
+                    <h1 className='text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl'>Sarajevo BAU</h1>
+                    <h2 className='text-lg text-slate-600 sm:text-xl'>
+                        Internacionalni sajam opremanja, gradnje i uređenja
+                    </h2>
 
-    return(
-        <>
-          <section id="hero" class="d-flex align-items-center">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-6 d-flex flex-column justify-content-center pt-4 pt-lg-0 order-2 order-lg-1" data-aos="fade-up" data-aos-delay="200">
-                    <h1>Sarajevo BAU</h1>
-                    <h2>Internacionalni sajam opremanja, gradnje i uređenja</h2>
-                    <div class="d-flex justify-content-center justify-content-lg-start">
-                        <a href="/login" class="btn-get-started scrollto text-decoration-none mx-3">Prijavi se</a>
-                        <a href="/register" class="btn-get-started-register scrollto text-decoration-none">Postani izlagač</a>
-                        <a href="https://www.youtube.com/watch?v=jDDaplaOz7Q" class="glightbox btn-watch-video text-decoration-none"><i class="bi bi-play-circle"></i><span>Pogledaj video</span></a>
-                    </div>
-                    </div>
-                    <div class="col-lg-6 order-1 order-lg-2 hero-img d-none d-lg-block" data-aos="zoom-in" data-aos-delay="200">
-                    <img src="assets/banner3.png" className="h-100"  alt=""/>
+                    <div className='flex flex-wrap items-center justify-start gap-3'>
+                        <a
+                            href='/login'
+                            className='rounded-md bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white no-underline shadow-sm transition hover:bg-blue-800'
+                        >
+                            Prijavi se
+                        </a>
+                        <a
+                            href='/register'
+                            className='rounded-md border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 no-underline transition hover:border-slate-400 hover:bg-slate-50'
+                        >
+                            Postani izlagač
+                        </a>
+                        <a
+                            href='https://www.youtube.com/watch?v=jDDaplaOz7Q'
+                            className='inline-flex items-center gap-2 text-sm font-medium text-slate-700 no-underline transition hover:text-slate-900'
+                            target='_blank'
+                            rel='noreferrer'
+                        >
+                            <span className='inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-300'>
+                                ▶
+                            </span>
+                            <span>Pogledaj video</span>
+                        </a>
                     </div>
                 </div>
             </div>
-            </section>
-        </>
+        </section>
     )
 }
 
-export default Hero;
+export default Hero
