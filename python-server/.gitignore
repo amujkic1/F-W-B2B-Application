@@ -1,0 +1,22 @@
+# Virtuelno okruženje (najbitnije!)
+venv/
+ENV/
+env/
+.env
+
+# Python keš
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Operativni sistem
+.DS_Store
+Thumbs.db
+
+# IDE i Editori
+.vscode/
+.idea/
+*.swp
+
+# FastAPI / Okruženje
+.env
