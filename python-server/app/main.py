@@ -10,10 +10,13 @@ from models.availability import Availability
 from models.unavailable_period import UnavailablePeriod
 from models.meeting_request import MeetingRequest
 from models.company import Company
+from api.auth import router as auth_router
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=settings.PROJECT_NAME)
+
+app.include_router(auth_router)
 
 @app.get("/info")
 def get_info():
