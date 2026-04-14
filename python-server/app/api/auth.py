@@ -17,8 +17,6 @@ router = APIRouter(prefix="/api/auth", tags=["authentication"])
 
 @router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 def register(user_in: UserCreate, db: Session = Depends(get_db)) -> UserRead:
-    print(f"DEBUG: Lozinka koja je stigla: {user_in.password}")
-    print(f"DEBUG: Dužina lozinke: {len(user_in.password)}")
     existing_user = db.query(User).filter(User.email == user_in.email).first()
     if existing_user is not None:
         raise HTTPException(
