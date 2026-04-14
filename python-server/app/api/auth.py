@@ -5,13 +5,36 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from core.config import settings
-from core.security import create_access_token, verify_password
+from core.security import create_access_token, hash_password, verify_password
 from db.database import get_db
 from models.user import User
 from schemas.token import Token
+from schemas.user import UserCreate, UserRead
 
 
 router = APIRouter(prefix="/api/auth", tags=["authentication"])
+
+
+@router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+def register(user_in: UserCreate, db: Session = Depends(get_db)) -> UserRead:
+    print(f"DEBUG: Lozinka koja je stigla: {user_in.password}")
+    print(f"DEBUG: Dužina lozinke: {len(user_in.password)}")
+    existing_user = db.query(User).filter(User.email == user_in.email).first()
+    if existing_user is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email is already registered",
+        )
+
+    user = User(
+        email=user_in.email,
+        password_hash=hash_password(user_in.password),
+        account_type=user_in.account_type,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
 
 
 @router.post("/login", response_model=Token)
