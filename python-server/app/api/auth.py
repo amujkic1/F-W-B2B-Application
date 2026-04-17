@@ -11,6 +11,7 @@ from db.database import get_db
 from models.user import User
 from schemas.token import Token
 from schemas.user import UserCreate, UserRead
+from jose import JWTError, jwt
 
 
 router = APIRouter(prefix="/api/auth", tags=["authentication"])

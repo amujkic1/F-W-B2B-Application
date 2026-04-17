@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, Enum, func
+from sqlalchemy import Column, String, DateTime, Enum, Boolean, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from db.database import Base
@@ -22,7 +22,7 @@ class User(Base):
         default='inactive', 
         nullable=False
     )
-    
+    is_verified = Column(Boolean, default=False)
     email_verified_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=func.now(), server_default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
