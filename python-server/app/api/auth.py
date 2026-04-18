@@ -1,14 +1,22 @@
-from datetime import timedelta
+from datetime import timedelta, datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, Query
 from services.email import send_verification_email
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from core.config import settings
-from core.security import create_access_token, hash_password, verify_password, create_verification_token
+from core.security import (
+    create_access_token, 
+    hash_password, 
+    verify_password, 
+    create_verification_token,
+    create_refresh_token,
+    verify_refresh_token
+)
 from db.database import get_db
 from models.user import User
+from models.user_refresh_tokens import UserRefreshToken
 from schemas.token import Token
 from schemas.user import UserCreate, UserRead
 from jose import JWTError, jwt
@@ -59,7 +67,20 @@ def login(
     access_token = create_access_token(
         data={"sub": str(user.id)}, expires_delta=access_token_expires
     )
-    return Token(access_token=access_token, token_type="bearer")
+    
+    refresh_token = create_refresh_token(str(user.id))
+    
+    # Spremi refresh token u bazu
+    expires_at = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+    db_refresh_token = UserRefreshToken(
+        user_id=user.id,
+        token=refresh_token,
+        expires_at=expires_at
+    )
+    db.add(db_refresh_token)
+    db.commit()
+    
+    return Token(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
 
 
 @router.get("/verify-email")
@@ -85,3 +106,71 @@ def verify_email(token: str, db: Session = Depends(get_db)):
         
     except JWTError:
         raise HTTPException(status_code=400, detail="Link je neispravan ili je istekao.")
+
+
+@router.post("/refresh", response_model=Token)
+def refresh(refresh_token: str = Query(..., description="Refresh token"), db: Session = Depends(get_db)):
+    """
+    Generiše novi access token koristeći refresh token
+    """
+    user_id = verify_refresh_token(refresh_token)
+    
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    # Provjeri da li je refresh token u bazi i nije revoked
+    db_token = db.query(UserRefreshToken).filter(
+        UserRefreshToken.token == refresh_token,
+        UserRefreshToken.is_revoked == False
+    ).first()
+    
+    if not db_token or db_token.expires_at < datetime.now(timezone.utc):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token has expired or been revoked"
+        )
+    
+    # Provjeri da li korisnik postoji i je aktivan
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user or user.status != "active":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User is not active"
+        )
+    
+    # Generiši novi access token
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    new_access_token = create_access_token(
+        data={"sub": str(user.id)}, expires_delta=access_token_expires
+    )
+    
+    return Token(
+        access_token=new_access_token, 
+        refresh_token=refresh_token, 
+        token_type="bearer"
+    )
+
+
+@router.post("/logout")
+def logout(refresh_token: str = Query(..., description="Refresh token"), db: Session = Depends(get_db)):
+    """
+    Revokira refresh token (logout korisnika)
+    """
+    db_token = db.query(UserRefreshToken).filter(
+        UserRefreshToken.token == refresh_token
+    ).first()
+    
+    if not db_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token"
+        )
+    
+    db_token.is_revoked = True
+    db.commit()
+    
+    return {"msg": "Successfully logged out"}

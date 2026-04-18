@@ -15,8 +15,10 @@ from models.meeting_request import MeetingRequest
 from models.profile_tag import ProfileTag
 from models.profile import Profile
 from models.tag import Tag
+from models.user_refresh_tokens import UserRefreshToken
 from models.unavailable_period import UnavailablePeriod
 from dotenv import load_dotenv
+import os
 load_dotenv()
 
 # this is the Alembic Config object, which provides
