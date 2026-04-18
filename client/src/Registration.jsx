@@ -1,9 +1,14 @@
-import React, {useEffect, useState} from "react"
-import {useNavigate} from 'react-router-dom'
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import Cookies from 'js-cookie'
 import { storage } from './firebase'
 import { ref, uploadBytes } from 'firebase/storage'
 import { v4 } from 'uuid'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './components/ui/card'
+import { Input } from './components/ui/input'
+import { Label } from './components/ui/label'
+import { Button } from './components/ui/button'
+import { Alert, AlertDescription } from './components/ui/alert'
 
 function Registration() {
 
@@ -14,11 +19,10 @@ function Registration() {
     const [phone, setPhone] = useState('')
     const [officialEmail, setOfficialEmail] = useState('')
     const [registrationEmail, setRegistrationEmail] = useState('')
-    const [password, setPassword] = useState('') 
-    const navigate = useNavigate('')
-    const [errorMessage, setErrorMessage] = useState('');
+    const [password, setPassword] = useState('')
+    const navigate = useNavigate()
+    const [errorMessage, setErrorMessage] = useState('')
     const [imageUpload, setImageUpload] = useState(null)
-    const [imageUrl, setImageUrl] = useState('')
 
 /*    const upload = () => {
         if(imageUpload==null) return
@@ -31,164 +35,246 @@ function Registration() {
 */
 
     const isValidEmail = (email) => {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
     }
 
     const handleRegistration = async () => {
         if (!isValidEmail(officialEmail)) {
-            console.log('not a valid email address');
-            setErrorMessage('Please enter a valid email address.');
-            return;
+            console.log('not a valid email address')
+            setErrorMessage('Please enter a valid email address.')
+            return
         }
-    
-        let uploadedImageUrl = ''; 
-    
+
+        let uploadedImageUrl = ''
+
         if (imageUpload) {
             try {
-                const imageRef = ref(storage, `b2b/${imageUpload.name + v4()}`);
-                await uploadBytes(imageRef, imageUpload);
-                uploadedImageUrl = imageRef.fullPath; 
-                console.log('Image uploaded:', uploadedImageUrl);
+                const imageRef = ref(storage, `b2b/${imageUpload.name + v4()}`)
+                await uploadBytes(imageRef, imageUpload)
+                uploadedImageUrl = imageRef.fullPath
+                console.log('Image uploaded:', uploadedImageUrl)
             } catch (error) {
-                console.error('Image upload failed:', error);
-                setErrorMessage('Image upload failed. Try again.');
-                return; 
+                console.error('Image upload failed:', error)
+                setErrorMessage('Image upload failed. Try again.')
+                return
             }
         }
-    
+
         fetch('http://localhost:5000/register', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
             credentials: 'include',
-            body: JSON.stringify({ company, id, name, address, phone, officialEmail, registrationEmail, password, imageUrl: uploadedImageUrl })
+            body: JSON.stringify({
+                company,
+                id,
+                name,
+                address,
+                phone,
+                officialEmail,
+                registrationEmail,
+                password,
+                imageUrl: uploadedImageUrl,
+            }),
         })
         .then(async response => {
             if (response.ok) {
-                const { message } = await response.json();
-                Cookies.set('email', registrationEmail);
-                navigate('/');
-                setErrorMessage('');
+                await response.json()
+                Cookies.set('email', registrationEmail)
+                navigate('/')
+                setErrorMessage('')
             } else {
                 return response.json().then(data => {
-                    throw new Error(data.message);
-                });
+                    throw new Error(data.message)
+                })
             }
         })
         .catch(err => {
-            console.error('Greška prilikom registracije: ', err);
-            setErrorMessage('Failed to register. Please try again.');
-        });
-    };
-    
+            console.error('Greška prilikom registracije: ', err)
+            setErrorMessage('Failed to register. Please try again.')
+        })
+    }
 
     return (
-        <section class="min-height-100 gradient-custom">
-            <div class="container py-5 h-100">
-                <div class="row justify-content-center align-items-center h-100">
-                <div class="col-12 col-sm-9 col-xl-7">
-                    <div class="card border border-1 shadow-2-strong card-registration rounded shadow-lg" >
-                    <div class="card-body p-4 p-md-5">
-                        <h3 class="mb-4 pb-2 pb-md-0 mb-md-5 text-center">Registracija kompanije</h3>
-                        <form onSubmit={(e) => { e.preventDefault(); handleRegistration(); }}>
+        <section className='h-screen overflow-hidden bg-slate-100'>
+            <div className='relative mx-auto grid h-screen max-w-7xl items-center gap-8 px-4 py-6 sm:px-6 lg:grid-cols-[1fr_560px] lg:px-8'>
+                <div className='pointer-events-none absolute -top-32 right-0 h-80 w-80 rounded-full bg-blue-300/40 blur-3xl' />
+                <div className='pointer-events-none absolute -bottom-28 left-0 h-80 w-80 rounded-full bg-emerald-300/40 blur-3xl' />
 
-                        <div class="row">
-                            <div class="col-md-6 mb-4">
+                <div className='relative hidden rounded-2xl bg-slate-900 p-10 text-white shadow-2xl lg:flex lg:flex-col lg:justify-between'>
+                    <div>
+                        <p className='mb-4 inline-flex rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200'>
+                            Business Registration
+                        </p>
+                        <h1 className='text-4xl font-semibold leading-tight'>Register your company</h1>
+                        <p className='mt-4 max-w-md text-slate-300'>
+                            Create a business account to access meetings, collaboration tools, and company management features.
+                        </p>
+                    </div>
 
-                            <div data-mdb-input-init class="form-outline">
-                                <input type="text" id="firstName" class="form-control form-control-sm" value={company} onChange={e => setCompany(e.target.value)} />
-                                <label class="form-label" for="firstName">Naziv kompanije</label>
-                            </div>
-
-                            </div>
-                            <div class="col-md-6 mb-4">
-
-                            <div data-mdb-input-init class="form-outline">
-                                <input type="text" id="lastName" class="form-control form-control-sm" value={id} onChange={e => setID(e.target.value)} />
-                                <label class="form-label" for="lastName">ID broj</label>
-                            </div>
-
-                            </div>
+                    <div className='grid grid-cols-2 gap-4 border-t border-white/15 pt-8 text-sm text-slate-300'>
+                        <div>
+                            <p className='font-semibold text-white'>Fast Setup</p>
+                            Quick registration process
                         </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-4">
-
-                            <div data-mdb-input-init class="form-outline">
-                                <input type="text" id="firstName" class="form-control form-control-sm" value={name} onChange={e => setName(e.target.value)}/>
-                                <label class="form-label" for="firstName">Ime i prezime ovlaštenog lica</label>
-                            </div>
-
-                            </div>
-                            <div class="col-md-6 mb-4">
-
-                            <div data-mdb-input-init class="form-outline">
-                                <input type="text" id="lastName" class="form-control form-control-sm" value={address} onChange={e => setAddress(e.target.value)}/>
-                                <label class="form-label" for="lastName">Adresa</label>
-                            </div>
-
-                            </div>
+                        <div>
+                            <p className='font-semibold text-white'>Verified</p>
+                            Professional verification
                         </div>
+                    </div>
+                </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-4 d-flex align-items-center">
+                <Card className='relative border-slate-200 bg-white/95 shadow-2xl backdrop-blur'>
+                    <CardHeader className='space-y-2'>
+                        <p className='inline-flex w-fit rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-blue-700'>
+                            Create Account
+                        </p>
+                        <CardTitle className='text-3xl'>Registracija kompanije</CardTitle>
+                        <CardDescription>
+                            Unesite podatke vase kompanije da biste kreirali poslovni racun.
+                        </CardDescription>
+                    </CardHeader>
 
-                            <div data-mdb-input-init class="form-outline datepicker w-100">
-                                <input type="text" class="form-control form-control-sm" id="birthdayDate" value={phone} onChange={e => setPhone(e.target.value)}/>
-                                <label for="birthdayDate" class="form-label">Službeni broj telefona</label>
+                    <CardContent>
+                        <form
+                            className='grid gap-4 sm:grid-cols-2'
+                            onSubmit={(e) => {
+                                e.preventDefault()
+                                handleRegistration()
+                            }}
+                        >
+                            <div className='space-y-2'>
+                                <Label htmlFor='company'>Naziv kompanije</Label>
+                                <Input
+                                    type='text'
+                                    id='company'
+                                    placeholder='Naziv kompanije'
+                                    value={company}
+                                    onChange={e => setCompany(e.target.value)}
+                                    required
+                                />
                             </div>
 
-                            </div>
-    
-                            <div class="col-md-6 mb-4 d-flex align-items-center">
-
-                            <div data-mdb-input-init class="form-outline datepicker w-100">
-                                <input type="text" class="form-control form-control-sm" id="birthdayDate" value={officialEmail} onChange={e => setOfficialEmail(e.target.value)}/>
-                                <label for="birthdayDate" class="form-label">Službeni email</label>
-                            </div>
-
-                            </div>
-
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-4 pb-2">
-
-                            <div data-mdb-input-init class="form-outline">
-                                <input type="email" id="emailAddress" class="form-control form-control-sm" value={registrationEmail} onChange={e => setRegistrationEmail(e.target.value)}/>
-                                <label class="form-label" for="emailAddress">Email za prijavu</label>
+                            <div className='space-y-2'>
+                                <Label htmlFor='id'>ID broj</Label>
+                                <Input
+                                    type='text'
+                                    id='id'
+                                    placeholder='ID broj'
+                                    value={id}
+                                    onChange={e => setID(e.target.value)}
+                                    required
+                                />
                             </div>
 
+                            <div className='space-y-2'>
+                                <Label htmlFor='name'>Ime i prezime ovlastenog lica</Label>
+                                <Input
+                                    type='text'
+                                    id='name'
+                                    placeholder='Ime i prezime'
+                                    value={name}
+                                    onChange={e => setName(e.target.value)}
+                                    required
+                                />
                             </div>
-                            <div class="col-md-6 mb-4 pb-2">
 
-                            <div data-mdb-input-init class="form-outline">
-                                <input type="tel" id="phoneNumber" class="form-control form-control-sm" value={password} onChange={e => setPassword(e.target.value)}/>
-                                <label class="form-label" for="phoneNumber">Lozinka</label>
+                            <div className='space-y-2'>
+                                <Label htmlFor='address'>Adresa</Label>
+                                <Input
+                                    type='text'
+                                    id='address'
+                                    placeholder='Adresa kompanije'
+                                    value={address}
+                                    onChange={e => setAddress(e.target.value)}
+                                    required
+                                />
                             </div>
 
+                            <div className='space-y-2'>
+                                <Label htmlFor='phone'>Sluzbeni broj telefona</Label>
+                                <Input
+                                    type='text'
+                                    id='phone'
+                                    placeholder='+385 1 234 5678'
+                                    value={phone}
+                                    onChange={e => setPhone(e.target.value)}
+                                    required
+                                />
                             </div>
-                        </div>
 
-                        <input type="file" 
-                            onChange={(event) => 
-                            {setImageUpload(event.target.files[0])}}/>
-
-                        <div class="row">
-                            <div class="mt-4 pt-2">
-                                <input data-mdb-ripple-init class="btn btn-primary btn-md w-100" type="submit" value="Kreiraj račun"/>
+                            <div className='space-y-2'>
+                                <Label htmlFor='officialEmail'>Sluzbeni email</Label>
+                                <Input
+                                    type='email'
+                                    id='officialEmail'
+                                    placeholder='info@kompanija.com'
+                                    value={officialEmail}
+                                    onChange={e => setOfficialEmail(e.target.value)}
+                                    required
+                                />
                             </div>
-                        </div>
 
+                            <div className='space-y-2'>
+                                <Label htmlFor='registrationEmail'>Email za prijavu</Label>
+                                <Input
+                                    type='email'
+                                    id='registrationEmail'
+                                    placeholder='vasa@kompanija.com'
+                                    value={registrationEmail}
+                                    onChange={e => setRegistrationEmail(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className='space-y-2'>
+                                <Label htmlFor='password'>Lozinka</Label>
+                                <Input
+                                    type='password'
+                                    id='password'
+                                    placeholder='Unesite lozinku'
+                                    value={password}
+                                    onChange={e => setPassword(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className='space-y-2 sm:col-span-2'>
+                                <Label htmlFor='logoUpload'>Logo kompanije (opciono)</Label>
+                                <Input
+                                    type='file'
+                                    id='logoUpload'
+                                    onChange={(event) => setImageUpload(event.target.files[0])}
+                                />
+                            </div>
+
+                            {errorMessage && (
+                                <div className='sm:col-span-2'>
+                                    <Alert variant='destructive'>
+                                        <AlertDescription>{errorMessage}</AlertDescription>
+                                    </Alert>
+                                </div>
+                            )}
+
+                            <div className='sm:col-span-2'>
+                                <Button type='submit' className='h-11 w-full text-base'>
+                                    Kreiraj racun
+                                </Button>
+                            </div>
                         </form>
-                    </div>
-                    </div>
-                </div>
-                </div>
+
+                        <p className='mt-6 border-t border-slate-100 pt-4 text-sm text-slate-600'>
+                            Vec imate racun?{' '}
+                            <Link to='/login' className='font-semibold text-blue-700 hover:text-blue-800'>
+                                Prijavite se
+                            </Link>
+                        </p>
+                    </CardContent>
+                </Card>
             </div>
         </section>
-    );
+    )
 }
 
 export default Registration;

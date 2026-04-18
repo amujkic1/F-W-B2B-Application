@@ -1,7 +1,7 @@
 import { storage } from './firebase'
 import { ref, uploadBytes } from 'firebase/storage'
 import { v4 } from 'uuid'
-const { useState } = require("react")
+import { useState } from 'react'
 
 function Firebase() {
 

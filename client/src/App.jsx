@@ -1,8 +1,7 @@
 import { Routes, Route } from "react-router-dom"
-import Header from './Header.jsx'
+import AppLayout from './AppLayout.jsx'
 import Hero from './Hero.jsx'
 import Main from './Main.jsx'
-import Footer from './Footer.jsx'
 import Register from './Registration.jsx'
 import B2BForm from './B2BForm.jsx'
 import Login from './Login.jsx'
@@ -20,33 +19,28 @@ import Agenda from "./Agenda.jsx"
 import Firebase from "./Firebase.jsx"
 
 function App() {
-/*
-      <Header/>
-      <Hero/>
-      <Main/>
-      <Footer/>
-*/
   return (
     <div className="App">
-      <Header />
       <Routes>
-        <Route path="/" element={<><Hero /><Clients /><AboutUs/> </>} />
-        <Route path="/services" element={<><Services/></>}/>
-        <Route path="/portfolio" element={<><Portfolio/></>}/>
-        <Route path="/team" element={<><Team/></>}/>
-        <Route path="/contact" element={<><Contact/></>}/>
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/companies" element={<CardContainer/>}/>
-        <Route path="/profile" element={<Profile/>}/>
-        <Route path="/agenda" element={<Agenda/>}/>
-        <Route path="/firebase" element={<Firebase/>}/>
-        <Route element={<ProtectedRoute />}>
-          <Route path="/b2b" element={<B2BAlt />} />
+        
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<><Hero /><Clients /><AboutUs/> </>} />
+          <Route path="/services" element={<><Services/></>}/>
+          <Route path="/portfolio" element={<><Portfolio/></>}/>
+          <Route path="/team" element={<><Team/></>}/>
+          <Route path="/contact" element={<><Contact/></>}/>
+          <Route path="/companies" element={<CardContainer/>}/>
+          <Route path="/profile" element={<Profile/>}/>
+          <Route path="/agenda" element={<Agenda/>}/>
+          <Route path="/firebase" element={<Firebase/>}/>
+          <Route element={<ProtectedRoute />}>
+            <Route path="/b2b" element={<B2BAlt />} />
+          </Route>
+          <Route path="*" element={<h2>404 - Page Not Found</h2>} />
         </Route>
-        <Route path="*" element={<h2>404 - Page Not Found</h2>} />
       </Routes>
-      <Footer />
     </div>
   );
 }
