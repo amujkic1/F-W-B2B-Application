@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Fontovi iz templatea */
+    --font-inter: "Inter", sans-serif;
+
+    /* Primarne boje iz templatea (pretvorene u HSL za shadcn) */
+    --background: 0 0% 100%;
+    --foreground: 221 39% 11%; /* dark color */
+
+    --card: 0 0% 100%;
+    --card-foreground: 221 39% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 221 39% 11%;
+
+    /* Brand Primary: #3758f9 */
+    --primary: 231 95% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Brand Secondary (Green): #13c296 */
+    --secondary: 165 82% 42%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 210 20% 96%;
+    --muted-foreground: 208 13% 45%; /* body-color */
+
+    --accent: 231 95% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%; /* stroke color */
+    --input: 214 32% 91%;
+    --ring: 231 95% 60%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 221 39% 11%;
+    --foreground: 210 40% 98%;
+
+    --card: 221 39% 11%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 221 39% 11%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 231 95% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 165 82% 42%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 217 19% 27%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 217 19% 27%;
+    --accent-foreground: 210 40% 98%;
+
+    --border: 217 19% 27%;
+    --input: 217 19% 27%;
+    --ring: 231 95% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-inter);
+  }
+}
+
+/* Custom klase specifične za tvoj template koje shadcn nema defaultno */
+@layer components {
+  .sticky-header {
+    @apply fixed z-50 bg-white/80 backdrop-blur-md shadow-sm transition-all;
+  }
+}
