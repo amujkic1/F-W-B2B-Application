@@ -4,68 +4,93 @@
 
 @layer base {
   :root {
-    /* Fontovi iz templatea */
+    /* Typography */
     --font-inter: "Inter", sans-serif;
 
-    /* Primarne boje iz templatea (pretvorene u HSL za shadcn) */
+    /* Light Mode - Emerald Theme */
+    /* Background & Foreground */
     --background: 0 0% 100%;
-    --foreground: 221 39% 11%; /* dark color */
+    --foreground: 0 0% 3%;
 
+    /* Card */
     --card: 0 0% 100%;
-    --card-foreground: 221 39% 11%;
+    --card-foreground: 0 0% 3%;
 
+    /* Popover */
     --popover: 0 0% 100%;
-    --popover-foreground: 221 39% 11%;
+    --popover-foreground: 0 0% 3%;
 
-    /* Brand Primary: #3758f9 */
-    --primary: 231 95% 60%;
+    /* Primary - Emerald */
+    --primary: 160 84% 39%;
     --primary-foreground: 0 0% 100%;
 
-    /* Brand Secondary (Green): #13c296 */
-    --secondary: 165 82% 42%;
+    /* Secondary - Emerald Light */
+    --secondary: 160 84% 49%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 20% 96%;
-    --muted-foreground: 208 13% 45%; /* body-color */
-
-    --accent: 231 95% 60%;
+    /* Accent - Emerald Dark */
+    --accent: 160 84% 29%;
     --accent-foreground: 0 0% 100%;
 
+    /* Muted */
+    --muted: 210 20% 96%;
+    --muted-foreground: 208 13% 45%;
+
+    /* Destructive */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%; /* stroke color */
+    /* Border & Input */
+    --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 231 95% 60%;
 
-    --radius: 0.5rem;
+    /* Ring - Emerald */
+    --ring: 160 84% 39%;
+
+    /* Radius */
+    --radius: 0.75rem;
   }
 
   .dark {
-    --background: 221 39% 11%;
-    --foreground: 210 40% 98%;
+    /* Dark Mode - Emerald Theme */
+    /* Background & Foreground */
+    --background: 0 0% 3%;
+    --foreground: 0 0% 98%;
 
-    --card: 221 39% 11%;
-    --card-foreground: 210 40% 98%;
+    /* Card */
+    --card: 24 10% 10%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 221 39% 11%;
-    --popover-foreground: 210 40% 98%;
+    /* Popover */
+    --popover: 24 10% 10%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 231 95% 60%;
+    /* Primary - Emerald */
+    --primary: 160 84% 39%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 165 82% 42%;
+    /* Secondary - Emerald Light */
+    --secondary: 160 84% 49%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 217 19% 27%;
+    /* Accent - Emerald Bright */
+    --accent: 160 84% 59%;
+    --accent-foreground: 0 0% 3%;
+
+    /* Muted */
+    --muted: 24 10% 20%;
     --muted-foreground: 215 20% 65%;
 
-    --accent: 217 19% 27%;
-    --accent-foreground: 210 40% 98%;
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217 19% 27%;
-    --input: 217 19% 27%;
-    --ring: 231 95% 60%;
+    /* Border & Input */
+    --border: 24 10% 20%;
+    --input: 24 10% 20%;
+
+    /* Ring - Emerald */
+    --ring: 160 84% 39%;
   }
 }
 
@@ -73,15 +98,90 @@
   * {
     @apply border-border;
   }
+
+  html {
+    @apply scroll-smooth;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
     font-family: var(--font-inter);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-semibold text-foreground;
   }
 }
 
-/* Custom klase specifične za tvoj template koje shadcn nema defaultno */
 @layer components {
+  /* Layout Components */
+  .layout-container {
+    @apply min-h-screen w-full bg-background text-foreground;
+  }
+
+  .main-content {
+    @apply bg-slate-50 transition-colors duration-300;
+  }
+
+  .dark .main-content {
+    @apply bg-zinc-950;
+  }
+
+  /* Header Styles */
   .sticky-header {
-    @apply fixed z-50 bg-white/80 backdrop-blur-md shadow-sm transition-all;
+    @apply fixed top-0 right-0 left-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl transition-all duration-300;
+  }
+
+  /* Sidebar Styles */
+  .sidebar {
+    @apply fixed left-0 top-0 h-screen w-64 border-r border-border bg-card transition-all duration-300;
+  }
+
+  .sidebar-collapsed {
+    @apply -translate-x-full md:translate-x-0 md:w-20;
+  }
+
+  /* Card Styles */
+  .card-elevated {
+    @apply rounded-[var(--radius)] border border-border bg-card p-6 shadow-sm transition-all duration-200 hover:shadow-md;
+  }
+
+  .card-subtle {
+    @apply rounded-[var(--radius)] bg-muted/30 p-4 transition-colors duration-200;
+  }
+
+  /* Button Base */
+  .btn-base {
+    @apply inline-flex items-center justify-center rounded-[var(--radius)] font-medium transition-all duration-200;
+  }
+
+  .btn-ghost {
+    @apply btn-base hover:bg-muted/50 text-foreground;
+  }
+
+  /* Search Bar */
+  .search-input {
+    @apply w-full rounded-[var(--radius)] border border-border bg-muted/30 px-4 py-2 text-sm text-foreground placeholder-muted-foreground transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50;
+  }
+
+  /* Smooth Transitions */
+  .transition-smooth {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  /* Responsive Utilities */
+  .sidebar-offset {
+    @apply md:ml-64;
+  }
+
+  .sidebar-offset-collapsed {
+    @apply md:ml-20;
   }
 }

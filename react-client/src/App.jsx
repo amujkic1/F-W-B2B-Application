@@ -4,20 +4,41 @@ import {
   Route,
   Routes,
 } from 'react-router-dom'
-
+import { ThemeProvider } from '@/contexts/ThemeContext'
+import { Layout } from '@/components/Layout'
+import { Dashboard } from '@/pages/Dashboard'
 import { LoginPage } from '@/pages/LoginPage.jsx'
 import { RegistrationPage } from '@/pages/RegistrationPage.jsx'
 
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegistrationPage />} />
+      
+      {/* Protected routes with layout */}
+      <Route
+        path="/dashboard"
+        element={
+          <Layout>
+            <Dashboard />
+          </Layout>
+        }
+      />
+      
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
+  )
+}
+
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegistrationPage />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </ThemeProvider>
   )
 }
 
