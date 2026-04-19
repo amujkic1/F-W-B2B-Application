@@ -39,6 +39,7 @@ def register(user_in: UserCreate, background_tasks: BackgroundTasks, db: Session
         password_hash=hash_password(user_in.password),
         account_type=user_in.account_type,
     )
+    print(user)
     db.add(user)
     db.commit()
     db.refresh(user)
