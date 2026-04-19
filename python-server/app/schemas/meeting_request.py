@@ -23,6 +23,21 @@ class MeetingRequestCreate(MeetingRequestBase):
     pass
 
 
+class MeetingRequestUpdate(BaseModel):
+    requester_user_id: Optional[UUID] = None
+    recipient_user_id: Optional[UUID] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+    meeting_type: Optional[Literal['online', 'offline']] = None
+    location_text: Optional[str] = None
+    meeting_link: Optional[str] = None
+    requested_start_at: Optional[datetime] = None
+    requested_end_at: Optional[datetime] = None
+    status: Optional[Literal['pending', 'accepted', 'rejected', 'cancelled', 'completed']] = None
+    note_from_requester: Optional[str] = None
+    note_from_recipient: Optional[str] = None
+
+
 class MeetingRequestRead(MeetingRequestBase):
     id: UUID
     created_at: datetime

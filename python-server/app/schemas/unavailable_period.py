@@ -15,6 +15,13 @@ class UnavailablePeriodCreate(UnavailablePeriodBase):
     pass
 
 
+class UnavailablePeriodUpdate(BaseModel):
+    user_id: Optional[UUID] = None
+    start_datetime: Optional[datetime] = None
+    end_datetime: Optional[datetime] = None
+    reason: Optional[str] = None
+
+
 class UnavailablePeriodRead(UnavailablePeriodBase):
     id: UUID
     created_at: datetime

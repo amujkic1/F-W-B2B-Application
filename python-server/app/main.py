@@ -12,6 +12,10 @@ from models.unavailable_period import UnavailablePeriod
 from models.meeting_request import MeetingRequest
 from models.company import Company
 from api.auth import router as auth_router
+from api.meeting_request import router as meeting_request_router
+from api.profile import router as profile_router
+from api.industry import router as industry_router
+from api.unavailable_period import router as unavailable_period_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -27,6 +31,10 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(meeting_request_router)
+app.include_router(profile_router)
+app.include_router(industry_router)
+app.include_router(unavailable_period_router)
 
 @app.get("/info")
 def get_info():
