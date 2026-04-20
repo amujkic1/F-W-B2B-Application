@@ -26,93 +26,100 @@ export const Sidebar = ({ isOpen, onClose }) => {
 
   return (
     <>
-      {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30 md:hidden transition-opacity"
+          className="fixed inset-0 z-30 bg-slate-950/50 backdrop-blur-[2px] md:hidden"
           onClick={onClose}
           aria-hidden="true"
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={`
-          fixed top-0 left-0 h-screen w-64 bg-card border-r border-border z-40
-          transition-transform duration-300 md:translate-x-0
+          fixed left-0 top-0 z-40 flex h-screen w-72 flex-col border-r border-border/70 bg-background/90 backdrop-blur-xl transition-transform duration-300 md:translate-x-0
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
-        {/* Logo Section */}
-        <div className="h-16 px-6 flex items-center justify-between border-b border-border bg-gradient-to-r from-primary/10 to-accent/10">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold text-sm">
-              F-W
+        <div className="border-b border-border/70 px-5 py-5">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent-secondary text-sm font-semibold text-white shadow-accent">
+                F-W
+              </div>
+              <div>
+                <span className="section-label text-muted-foreground">Minimalist Modern</span>
+                <p className="text-sm font-semibold text-foreground">B2B Hub</p>
+              </div>
             </div>
-            <span className="font-semibold text-foreground hidden sm:inline">
-              B2B Hub
-            </span>
-          </div>
-          <button
-            onClick={onClose}
-            className="md:hidden p-1 hover:bg-muted rounded-[var(--radius)] transition-colors"
-            aria-label="Close menu"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+            <button
+              onClick={onClose}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border/70 bg-card/90 text-foreground shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/30 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/20 md:hidden"
+              aria-label="Close menu"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <div className="mt-4 flex items-center gap-2 rounded-2xl border border-border/70 bg-muted/35 px-3 py-2">
+            <span className="section-pill-dot animate-pulse-dot" />
+            <span className="text-xs text-muted-foreground">Workspace online</span>
+          </div>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 px-3 py-6 space-y-2">
-          <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-            Main Menu
-          </p>
+        <nav className="flex-1 px-4 py-6">
+          <p className="section-label mb-4 px-3 text-muted-foreground">Main Menu</p>
 
-          {navItems.map((item) => {
-            const Icon = item.icon
-            const active = isActive(item.href)
+          <div className="space-y-2">
+            {navItems.map((item) => {
+              const Icon = item.icon
+              const active = isActive(item.href)
 
-            return (
-              <Link
-                key={item.href}
-                to={item.href}
-                onClick={onClose}
-                className={`
-                  flex items-center gap-3 px-3 py-3 rounded-[var(--radius)] transition-all duration-200
-                  ${
+              return (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  onClick={onClose}
+                  className={`group flex items-center gap-3 rounded-2xl px-3 py-3 transition-all duration-200 ${
                     active
-                      ? 'bg-primary/10 text-primary font-semibold'
-                      : 'text-foreground hover:bg-muted'
-                  }
-                `}
-              >
-                <Icon className="w-5 h-5 flex-shrink-0" />
-                <span className="flex-1">{item.label}</span>
-                {active && (
-                  <ChevronRight className="w-4 h-4 text-primary" />
-                )}
-              </Link>
-            )
-          })}
+                      ? 'bg-gradient-to-r from-primary/10 to-accent-secondary/10 text-foreground shadow-sm ring-1 ring-accent/15'
+                      : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground'
+                  }`}
+                >
+                  <span
+                    className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
+                      active
+                        ? 'bg-gradient-to-br from-primary to-accent-secondary text-white shadow-accent'
+                        : 'bg-muted/70 text-muted-foreground group-hover:bg-card group-hover:text-accent'
+                    }`}
+                  >
+                    <Icon className="h-5 w-5 flex-shrink-0" />
+                  </span>
+                  <span className="flex-1 text-sm font-medium">{item.label}</span>
+                  {active && <ChevronRight className="h-4 w-4 text-accent" />}
+                </Link>
+              )
+            })}
+          </div>
         </nav>
 
-        {/* Bottom Section */}
-        <div className="border-t border-border p-3">
-          <button className="w-full flex items-center gap-3 px-3 py-3 rounded-[var(--radius)] text-foreground hover:bg-muted transition-colors">
-            <LogOut className="w-5 h-5 flex-shrink-0" />
-            <span>Logout</span>
+        <div className="border-t border-border/70 p-4">
+          <button className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-foreground transition-colors hover:bg-muted/70">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/70 text-muted-foreground">
+              <LogOut className="h-5 w-5" />
+            </span>
+            <span className="text-sm font-medium">Logout</span>
           </button>
         </div>
       </aside>

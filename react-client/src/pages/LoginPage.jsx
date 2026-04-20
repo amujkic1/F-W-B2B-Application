@@ -42,18 +42,27 @@ export function LoginPage() {
   }
 
   return (
-    <main className="relative grid min-h-screen place-items-center overflow-hidden bg-background px-4 py-10">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_hsl(var(--foreground)/0.08),_transparent_45%),linear-gradient(to_bottom,_hsl(var(--background)),_hsl(var(--muted)/0.3))]" />
-      <Card className="relative z-10 w-full max-w-md backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle>Prijava</CardTitle>
-          <CardDescription>
-            Prijavi se na svoj B2B račun da nastaviš.
-          </CardDescription>
+    <main className="app-shell grid min-h-screen place-items-center px-4 py-10">
+      <div className="pointer-events-none absolute inset-0 dot-grid opacity-[0.03]" />
+      <div className="pointer-events-none absolute left-[-10%] top-10 h-72 w-72 rounded-full bg-primary/10 blur-[120px]" />
+      <div className="pointer-events-none absolute bottom-[-12%] right-[-8%] h-80 w-80 rounded-full bg-accent-secondary/10 blur-[140px]" />
+
+      <Card className="relative z-10 w-full max-w-md animate-reveal">
+        <CardHeader className="space-y-4">
+          <div className="section-pill w-fit">
+            <span className="section-pill-dot animate-pulse-dot" />
+            <span className="section-label text-accent">Secure access</span>
+          </div>
+          <div className="space-y-2">
+            <CardTitle className="text-3xl md:text-4xl">Prijava</CardTitle>
+            <CardDescription>
+              Prijavi se na svoj B2B račun da nastaviš.
+            </CardDescription>
+          </div>
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -83,7 +92,7 @@ export function LoginPage() {
             <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
               <input
                 type="checkbox"
-                className="size-4 rounded border-input text-primary focus:ring-ring"
+                className="size-4 rounded border-input text-primary focus:ring-2 focus:ring-accent/20"
                 checked={rememberMe}
                 onChange={(event) => setRememberMe(event.target.checked)}
               />
@@ -96,11 +105,14 @@ export function LoginPage() {
           </form>
         </CardContent>
 
-        <CardFooter className="flex flex-col items-start gap-2">
+        <CardFooter className="flex flex-col items-start gap-3">
           <p className="text-sm text-muted-foreground">{message || ' '}</p>
           <p className="text-sm text-muted-foreground">
             Nemaš račun?{' '}
-            <Link to="/register" className={buttonVariants({ variant: 'link', className: 'h-auto p-0' })}>
+            <Link
+              to="/register"
+              className={buttonVariants({ variant: 'link', className: 'h-auto p-0' })}
+            >
               Registruj se
             </Link>
           </p>

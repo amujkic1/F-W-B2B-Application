@@ -1,90 +1,222 @@
+@import url('https://fonts.googleapis.com/css2?family=Calistoga&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  .theme {
-    --font-heading: var(--font-sans);
-    --font-sans: 'Geist Variable', sans-serif
-  }
   :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0)
+    --font-sans: 'Inter', sans-serif;
+    --font-heading: 'Calistoga', Georgia, serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --background: 0 0% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 221 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 221 100% 50%;
+    --accent-secondary: 225 100% 65%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 100% 50%;
+    --chart-1: 221 100% 50%;
+    --chart-2: 225 100% 65%;
+    --chart-3: 160 84% 39%;
+    --chart-4: 38 92% 50%;
+    --chart-5: 340 82% 52%;
+    --radius: 0.875rem;
+    --sidebar: 0 0% 100%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 221 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 221 100% 50%;
   }
+
   .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0)
+    --background: 222 47% 11%;
+    --foreground: 0 0% 98%;
+    --card: 222 40% 15%;
+    --card-foreground: 0 0% 98%;
+    --popover: 222 40% 15%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 221 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 222 32% 20%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 222 32% 20%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 221 100% 50%;
+    --accent-secondary: 225 100% 68%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --border: 215 28% 20%;
+    --input: 215 28% 20%;
+    --ring: 221 100% 50%;
+    --chart-1: 221 100% 50%;
+    --chart-2: 225 100% 68%;
+    --chart-3: 160 84% 39%;
+    --chart-4: 38 92% 50%;
+    --chart-5: 340 82% 52%;
+    --sidebar: 222 40% 15%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 221 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 222 32% 20%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 215 28% 20%;
+    --sidebar-ring: 221 100% 50%;
   }
+
   * {
     @apply border-border;
-    outline-color: color-mix(in oklab, var(--ring), transparent 50%);
+    outline-color: color-mix(in oklab, hsl(var(--ring)), transparent 50%);
   }
-  body {
-    @apply bg-background text-foreground;
-  }
+
   html {
-    @apply font-sans;
+    @apply scroll-smooth font-sans;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    min-height: 100vh;
+    text-rendering: optimizeLegibility;
+    background-image:
+      radial-gradient(circle at top left, hsl(var(--accent) / 0.08), transparent 28%),
+      radial-gradient(circle at top right, hsl(var(--accent-secondary) / 0.08), transparent 24%),
+      linear-gradient(to bottom, hsl(var(--background)), hsl(var(--background)));
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background: hsl(var(--accent) / 0.16);
+    color: hsl(var(--foreground));
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .app-shell {
+    @apply relative min-h-screen overflow-hidden bg-background text-foreground;
+  }
+
+  .shell-panel {
+    @apply rounded-[1.75rem] border border-border/70 bg-card/95 shadow-[0_24px_80px_rgba(15,23,42,0.06)] backdrop-blur-sm;
+  }
+
+  .shell-panel-hover {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_28px_90px_rgba(15,23,42,0.1)];
+  }
+
+  .surface-inverted {
+    @apply rounded-[1.75rem] bg-foreground text-background shadow-[0_24px_80px_rgba(15,23,42,0.18)];
+  }
+
+  .section-pill {
+    @apply inline-flex items-center gap-3 rounded-full border border-accent/20 bg-accent/5 px-4 py-2;
+  }
+
+  .section-pill-dot {
+    @apply h-2 w-2 rounded-full bg-accent shadow-[0_0_0_6px_rgba(0,82,255,0.12)];
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary to-accent-secondary bg-clip-text text-transparent;
+  }
+
+  .gradient-border {
+    @apply rounded-[1.75rem] bg-gradient-to-br from-primary via-accent-secondary to-accent p-px;
+  }
+
+  .dot-grid {
+    background-image: radial-gradient(circle, rgba(15, 23, 42, 0.18) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .dot-grid-inverted {
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .section-label {
+    @apply font-mono text-[0.72rem] uppercase tracking-[0.2em];
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-float-delayed {
+    animation: float 7.5s ease-in-out infinite;
+    animation-delay: -1.5s;
+  }
+
+  .animate-spin-slow {
+    animation: spin 60s linear infinite;
+  }
+
+  .animate-pulse-dot {
+    animation: pulseDot 2s ease-in-out infinite;
+  }
+
+  .animate-reveal {
+    animation: reveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulseDot {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.25);
+    opacity: 0.72;
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

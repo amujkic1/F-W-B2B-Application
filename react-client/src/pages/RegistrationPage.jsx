@@ -77,18 +77,27 @@ export function RegistrationPage() {
   }
 
   return (
-    <main className="relative grid min-h-screen place-items-center overflow-hidden bg-background px-4 py-10">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_bottom,_hsl(var(--foreground)/0.09),_transparent_45%),linear-gradient(to_top,_hsl(var(--background)),_hsl(var(--muted)/0.35))]" />
-      <Card className="relative z-10 w-full max-w-lg backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle>Registracija</CardTitle>
-          <CardDescription>
-            Kreiraj B2B račun i započni povezivanje s partnerima.
-          </CardDescription>
+    <main className="app-shell grid min-h-screen place-items-center px-4 py-10">
+      <div className="pointer-events-none absolute inset-0 dot-grid opacity-[0.03]" />
+      <div className="pointer-events-none absolute left-[-12%] top-16 h-72 w-72 rounded-full bg-accent/10 blur-[120px]" />
+      <div className="pointer-events-none absolute right-[-8%] bottom-[-10%] h-80 w-80 rounded-full bg-primary/10 blur-[140px]" />
+
+      <Card className="relative z-10 w-full max-w-lg animate-reveal">
+        <CardHeader className="space-y-4">
+          <div className="section-pill w-fit">
+            <span className="section-pill-dot animate-pulse-dot" />
+            <span className="section-label text-accent">Create account</span>
+          </div>
+          <div className="space-y-2">
+            <CardTitle className="text-3xl md:text-4xl">Registracija</CardTitle>
+            <CardDescription>
+              Kreiraj B2B račun i započni povezivanje s partnerima.
+            </CardDescription>
+          </div>
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="companyName">Naziv firme</Label>
@@ -157,7 +166,7 @@ export function RegistrationPage() {
             <label className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
               <input
                 type="checkbox"
-                className="size-4 rounded border-input text-primary focus:ring-ring"
+                className="size-4 rounded border-input text-primary focus:ring-2 focus:ring-accent/20"
                 checked={termsAccepted}
                 onChange={(event) => setTermsAccepted(event.target.checked)}
               />
@@ -170,14 +179,17 @@ export function RegistrationPage() {
           </form>
         </CardContent>
 
-        <CardFooter className="flex flex-col items-start gap-2">
+        <CardFooter className="flex flex-col items-start gap-3">
           {errorMessage && (
             <p className="text-sm text-destructive">{errorMessage}</p>
           )}
           <p className="text-sm text-muted-foreground">{message || ' '}</p>
           <p className="text-sm text-muted-foreground">
             Već imaš račun?{' '}
-            <Link to="/login" className={buttonVariants({ variant: 'link', className: 'h-auto p-0' })}>
+            <Link
+              to="/login"
+              className={buttonVariants({ variant: 'link', className: 'h-auto p-0' })}
+            >
               Prijavi se
             </Link>
           </p>
