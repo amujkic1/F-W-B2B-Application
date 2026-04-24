@@ -1,35 +1,35 @@
 from pydantic import BaseModel, HttpUrl
 from uuid import UUID
 from datetime import datetime
-from typing import Optional, Literal
+from typing import Literal
 
 class ProfileBase(BaseModel):
     first_name: str
     last_name: str
-    headline: Optional[str] = None
-    bio: Optional[str] = None
-    city: Optional[str] = None
+    headline: str | None = None
+    bio: str | None = None
+    city: str | None = None
     country: str = "BiH"
-    looking_for: Optional[Literal['client', 'job', 'partner', 'networking']] = None
+    looking_for: Literal['client', 'job', 'partner', 'networking'] | None = None
 
 class ProfileCreate(ProfileBase):
     user_id: UUID
 
 
 class ProfileUpdate(BaseModel):
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    headline: Optional[str] = None
-    bio: Optional[str] = None
-    city: Optional[str] = None
-    country: Optional[str] = None
-    looking_for: Optional[Literal['client', 'job', 'partner', 'networking']] = None
-    profile_image_url: Optional[str] = None
+    first_name: str | None = None
+    last_name: str | None = None
+    headline: str | None = None
+    bio: str | None = None
+    city: str | None = None
+    country: str | None = None
+    looking_for: Literal['client', 'job', 'partner', 'networking'] | None = None
+    profile_image_url: str | None = None
 
 class ProfileRead(ProfileBase):
     id: UUID
     user_id: UUID
-    profile_image_url: Optional[str] = None
+    profile_image_url: str | None = None
     created_at: datetime
     updated_at: datetime
 

@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr, Field
 from uuid import UUID
 from datetime import datetime
-from typing import Optional, Literal
+from typing import Literal
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -14,7 +14,7 @@ class UserRead(BaseModel):
     account_type: str
     status: str
     created_at: datetime
-    email_verified_at: Optional[datetime] = None
+    email_verified_at: datetime | None = None
 
     class Config:
         from_attributes = True

@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import String, Text, ForeignKey
+from sqlalchemy import String, Text, ForeignKey, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from db.database import Base
@@ -21,10 +21,8 @@ class Profile(Base):
     avatar_url: Mapped[str | None] = mapped_column(String, nullable=True)
     linkedin_url: Mapped[str | None] = mapped_column(String, nullable=True)
     bio: Mapped[str | None] = mapped_column(Text, nullable=True)
-    accepting_meetings = Column(Boolean, default=True)
-    
-    # Kratka poruka o dostupnosti (npr. "Samo poslije 15h")
-    availability_note = Column(String(255), nullable=True)
+    accepting_meetings: Mapped[bool | None] = mapped_column(Boolean, default=True)
+    availability_note : Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     user: Mapped["User"] = relationship("User", back_populates="profile")
     company: Mapped["Company | None"] = relationship(

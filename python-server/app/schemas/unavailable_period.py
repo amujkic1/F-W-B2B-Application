@@ -1,14 +1,13 @@
 from pydantic import BaseModel
 from uuid import UUID
 from datetime import datetime
-from typing import Optional
 
 
 class UnavailablePeriodBase(BaseModel):
     user_id: UUID
     start_datetime: datetime
     end_datetime: datetime
-    reason: Optional[str] = None
+    reason: str | None = None
 
 
 class UnavailablePeriodCreate(UnavailablePeriodBase):
@@ -16,10 +15,10 @@ class UnavailablePeriodCreate(UnavailablePeriodBase):
 
 
 class UnavailablePeriodUpdate(BaseModel):
-    user_id: Optional[UUID] = None
-    start_datetime: Optional[datetime] = None
-    end_datetime: Optional[datetime] = None
-    reason: Optional[str] = None
+    user_id: UUID | None = None
+    start_datetime: datetime | None = None
+    end_datetime: datetime | None = None
+    reason: str | None = None
 
 
 class UnavailablePeriodRead(UnavailablePeriodBase):
