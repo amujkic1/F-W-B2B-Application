@@ -77,12 +77,12 @@ export function RegistrationPage() {
   }
 
   return (
-    <main className="app-shell grid min-h-screen place-items-center px-4 py-10">
+    <main className="app-shell grid h-screen place-items-center overflow-hidden px-4 py-4">
       <div className="pointer-events-none absolute inset-0 dot-grid opacity-[0.03]" />
       <div className="pointer-events-none absolute left-[-12%] top-16 h-72 w-72 rounded-full bg-accent/10 blur-[120px]" />
       <div className="pointer-events-none absolute right-[-8%] bottom-[-10%] h-80 w-80 rounded-full bg-primary/10 blur-[140px]" />
 
-      <Card className="relative z-10 w-full max-w-lg animate-reveal">
+      <Card className="relative z-10 flex max-h-[calc(100vh-2rem)] w-full max-w-lg flex-col animate-reveal">
         <CardHeader className="space-y-4">
           <div className="section-pill w-fit">
             <span className="section-pill-dot animate-pulse-dot" />
@@ -96,7 +96,7 @@ export function RegistrationPage() {
           </div>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="overflow-y-auto">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2 sm:col-span-2">
