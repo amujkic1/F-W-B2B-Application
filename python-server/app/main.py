@@ -11,6 +11,7 @@ from models.availability import Availability
 from models.unavailable_period import UnavailablePeriod
 from models.meeting_request import MeetingRequest
 from models.company import Company
+from models.company_type import CompanyType
 from api.auth import router as auth_router
 from api.meeting_request import router as meeting_request_router
 from api.profile import router as profile_router

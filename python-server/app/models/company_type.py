@@ -1,12 +1,12 @@
 import uuid
 from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from db.database import Base
 
 
-class Industry(Base):
-    __tablename__ = "industries"
+class CompanyType(Base):
+    __tablename__ = "company_types"
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -15,4 +15,5 @@ class Industry(Base):
         index=True,
     )
     name: Mapped[str] = mapped_column(String, unique=True, nullable=False)
-    slug: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+
+    companies: Mapped[list["Company"]] = relationship("Company", back_populates="company_type")
