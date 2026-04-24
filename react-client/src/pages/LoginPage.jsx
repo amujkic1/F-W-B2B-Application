@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
-import { Button, buttonVariants } from '@/components/ui/button.jsx'
+import { Button, buttonVariants } from "@/components/ui/button.jsx";
 import {
   Card,
   CardContent,
@@ -9,35 +9,35 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card.jsx'
-import { Input } from '@/components/ui/input.jsx'
-import { Label } from '@/components/ui/label.jsx'
+} from "@/components/ui/card.jsx";
+import { Input } from "@/components/ui/input.jsx";
+import { Label } from "@/components/ui/label.jsx";
 
 export function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [rememberMe, setRememberMe] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [message, setMessage] = useState('')
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState("");
 
   async function handleSubmit(event) {
-    event.preventDefault()
-    setMessage('')
+    event.preventDefault();
+    setMessage("");
 
     if (!email.trim() || !password.trim()) {
-      setMessage('Unesi email i password.')
-      return
+      setMessage("Unesi email i password.");
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 600))
+      await new Promise((resolve) => setTimeout(resolve, 600));
       setMessage(
-        `Prijava uspješna za ${email}${rememberMe ? ' (remember me uključen)' : ''}.`
-      )
+        `Prijava uspješna za ${email}${rememberMe ? " (remember me uključen)" : ""}.`,
+      );
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -100,18 +100,21 @@ export function LoginPage() {
             </label>
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? 'Prijava u toku...' : 'Prijavi se'}
+              {isSubmitting ? "Prijava u toku..." : "Prijavi se"}
             </Button>
           </form>
         </CardContent>
 
         <CardFooter className="flex flex-col items-start gap-3">
-          <p className="text-sm text-muted-foreground">{message || ' '}</p>
+          <p className="text-sm text-muted-foreground">{message || " "}</p>
           <p className="text-sm text-muted-foreground">
-            Nemaš račun?{' '}
+            Nemaš račun?{" "}
             <Link
               to="/register"
-              className={buttonVariants({ variant: 'link', className: 'h-auto p-0' })}
+              className={buttonVariants({
+                variant: "link",
+                className: "h-auto p-0",
+              })}
             >
               Registruj se
             </Link>
@@ -119,5 +122,5 @@ export function LoginPage() {
         </CardFooter>
       </Card>
     </main>
-  )
+  );
 }

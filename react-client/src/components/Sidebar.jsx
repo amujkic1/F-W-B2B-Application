@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Settings, ChevronRight, LogOut } from 'lucide-react'
+import { LayoutDashboard, Users, Settings, ChevronRight, LogOut, Handshake } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 
 export const Sidebar = ({ isOpen, onClose }) => {
@@ -14,6 +14,11 @@ export const Sidebar = ({ isOpen, onClose }) => {
       label: 'Partners',
       href: '/partners',
       icon: Users,
+    },
+    {
+      label: 'Matchmaking',
+      href: '/matchmaking',
+      icon: Handshake,
     },
     {
       label: 'Settings',

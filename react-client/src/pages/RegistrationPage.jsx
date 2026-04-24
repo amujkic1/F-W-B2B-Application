@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
-import { useRegisterMutation } from '@/queries/useRegisterMutation.js'
-import { Button, buttonVariants } from '@/components/ui/button.jsx'
+import { useRegisterMutation } from "@/queries/useRegisterMutation.js";
+import { Button, buttonVariants } from "@/components/ui/button.jsx";
 import {
   Card,
   CardContent,
@@ -10,70 +10,75 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card.jsx'
-import { Input } from '@/components/ui/input.jsx'
-import { Label } from '@/components/ui/label.jsx'
+} from "@/components/ui/card.jsx";
+import { Input } from "@/components/ui/input.jsx";
+import { Label } from "@/components/ui/label.jsx";
 
 export function RegistrationPage() {
-  const [companyName, setCompanyName] = useState('')
-  const [fullName, setFullName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [termsAccepted, setTermsAccepted] = useState(false)
-  const [message, setMessage] = useState('')
-  const [errorMessage, setErrorMessage] = useState('')
+  const [companyName, setCompanyName] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [message, setMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const registerMutation = useRegisterMutation()
-  const isPending = registerMutation.isPending
+  const registerMutation = useRegisterMutation();
+  const isPending = registerMutation.isPending;
 
   async function handleSubmit(event) {
-    event.preventDefault()
-    setMessage('')
-    setErrorMessage('')
+    event.preventDefault();
+    setMessage("");
+    setErrorMessage("");
 
-    if (!companyName.trim() || !fullName.trim() || !email.trim() || !password.trim()) {
-      setErrorMessage('Popuni sva obavezna polja.')
-      return
+    if (
+      !companyName.trim() ||
+      !fullName.trim() ||
+      !email.trim() ||
+      !password.trim()
+    ) {
+      setErrorMessage("Popuni sva obavezna polja.");
+      return;
     }
 
     if (password.length < 8) {
-      setErrorMessage('Password mora imati najmanje 8 karaktera.')
-      return
+      setErrorMessage("Password mora imati najmanje 8 karaktera.");
+      return;
     }
 
     if (password.length > 50) {
-      setErrorMessage('Password ne smije biti duži od 50 karaktera.')
-      return
+      setErrorMessage("Password ne smije biti duži od 50 karaktera.");
+      return;
     }
 
     if (password !== confirmPassword) {
-      setErrorMessage('Password i potvrda passworda se ne podudaraju.')
-      return
+      setErrorMessage("Password i potvrda passworda se ne podudaraju.");
+      return;
     }
 
     if (!termsAccepted) {
-      setErrorMessage('Moraš prihvatiti uslove korištenja.')
-      return
+      setErrorMessage("Moraš prihvatiti uslove korištenja.");
+      return;
     }
 
     registerMutation.mutate(
       { email, password },
       {
         onSuccess: () => {
-          setMessage('Registracija uspješna. Možeš se prijaviti.')
-          setCompanyName('')
-          setFullName('')
-          setEmail('')
-          setPassword('')
-          setConfirmPassword('')
-          setTermsAccepted(false)
+          setMessage("Registracija uspješna. Možeš se prijaviti.");
+          setCompanyName("");
+          setFullName("");
+          setEmail("");
+          setPassword("");
+          setConfirmPassword("");
+          setTermsAccepted(false);
         },
         onError: (error) => {
-          setErrorMessage(error.message)
+          setErrorMessage(error.message);
         },
-      }
-    )
+      },
+    );
   }
 
   return (
@@ -174,7 +179,7 @@ export function RegistrationPage() {
             </label>
 
             <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? 'Kreiranje računa...' : 'Kreiraj račun'}
+              {isPending ? "Kreiranje računa..." : "Kreiraj račun"}
             </Button>
           </form>
         </CardContent>
@@ -183,12 +188,15 @@ export function RegistrationPage() {
           {errorMessage && (
             <p className="text-sm text-destructive">{errorMessage}</p>
           )}
-          <p className="text-sm text-muted-foreground">{message || ' '}</p>
+          <p className="text-sm text-muted-foreground">{message || " "}</p>
           <p className="text-sm text-muted-foreground">
-            Već imaš račun?{' '}
+            Već imaš račun?{" "}
             <Link
               to="/login"
-              className={buttonVariants({ variant: 'link', className: 'h-auto p-0' })}
+              className={buttonVariants({
+                variant: "link",
+                className: "h-auto p-0",
+              })}
             >
               Prijavi se
             </Link>
@@ -196,5 +204,5 @@ export function RegistrationPage() {
         </CardFooter>
       </Card>
     </main>
-  )
+  );
 }
