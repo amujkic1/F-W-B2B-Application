@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from core.config import settings
 from db.database import engine, Base
@@ -17,6 +17,7 @@ from api.meeting_request import router as meeting_request_router
 from api.profile import router as profile_router
 from api.industry import router as industry_router
 from api.unavailable_period import router as unavailable_period_router
+from api.deps import get_current_user
 
 Base.metadata.create_all(bind=engine)
 
@@ -32,12 +33,12 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
-app.include_router(meeting_request_router)
-app.include_router(profile_router)
-app.include_router(industry_router)
-app.include_router(unavailable_period_router)
+app.include_router(meeting_request_router, dependencies=[Depends(get_current_user)])
+app.include_router(profile_router, dependencies=[Depends(get_current_user)])
+app.include_router(industry_router, dependencies=[Depends(get_current_user)])
+app.include_router(unavailable_period_router, dependencies=[Depends(get_current_user)])
 
-@app.get("/info")
+@app.get("/info", dependencies=[Depends(get_current_user)])
 def get_info():
     return {
         "app_name": settings.PROJECT_NAME,

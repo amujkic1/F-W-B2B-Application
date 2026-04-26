@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { Button, buttonVariants } from "@/components/ui/button.jsx";
 import {
@@ -18,6 +18,11 @@ export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const fromPath = location.state?.from?.pathname || "/dashboard";
+  const fromSearch = location.state?.from?.search || "";
+  const fromHash = location.state?.from?.hash || "";
 
   const { 
     mutate: login, 
@@ -38,6 +43,7 @@ export function LoginPage() {
           setEmail("");
           setPassword("");
           setRememberMe(false);
+          navigate(`${fromPath}${fromSearch}${fromHash}`, { replace: true });
         },
       }
     );

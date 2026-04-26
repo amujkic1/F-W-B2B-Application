@@ -5,6 +5,17 @@ import { registerUser } from '@/api/auth.js'
 import { loginUser } from '../api/auth'
 import { useAppStore } from '../store/useAppStore';
 
+function getCookieOptions() {
+  const isSecure = window.location.protocol === 'https:'
+
+  return {
+    expires: 1,
+    secure: isSecure,
+    sameSite: isSecure ? 'strict' : 'lax',
+    path: '/',
+  }
+}
+
 export function useRegisterMutation() {
   return useMutation({
     mutationFn: registerUser,
@@ -18,16 +29,19 @@ export function useRegisterMutation() {
 }
 
 export function useLoginMutation() {
-
-  const navigate = useNavigate();
   const setUser = useAppStore((state) => state.setUser);
 
   return useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
-        Cookies.set('access_token', data.access_token, { expires: 1, secure: true, sameSite: 'strict' });
+        const cookieOptions = getCookieOptions()
+        Cookies.set('access_token', data.access_token, cookieOptions)
+
+        if (data.refresh_token) {
+          Cookies.set('refresh_token', data.refresh_token, cookieOptions)
+        }
+
         setUser(data.user);
-        navigate('/dashboard')
     },
     onError: (error) => {
       console.error('Greška pri prijavi:', error.message)

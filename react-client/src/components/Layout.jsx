@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Outlet } from 'react-router-dom'
 import { Header } from './Header'
 import { Sidebar } from './Sidebar'
 
@@ -23,7 +24,7 @@ export const Layout = ({ children }) => {
 
       <main className="relative min-h-screen pt-6 md:pl-72">
         <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-          {children}
+          {children ?? <Outlet />}
         </div>
       </main>
     </div>

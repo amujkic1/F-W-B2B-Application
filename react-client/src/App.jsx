@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { Layout } from "@/components/Layout";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Dashboard } from "@/pages/Dashboard";
 import { LoginPage } from "@/pages/LoginPage.jsx";
 import { MatchmakingPage } from "@/pages/MatchmakingPage.jsx";
@@ -12,24 +13,12 @@ function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegistrationPage />} />
 
-      {/* Protected routes with layout */}
-      <Route
-        path="/dashboard"
-        element={
-          <Layout>
-            <Dashboard />
-          </Layout>
-        }
-      />
-
-      <Route
-        path="/matchmaking"
-        element={
-          <Layout>
-            <MatchmakingPage />
-          </Layout>
-        }
-      />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<Layout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/matchmaking" element={<MatchmakingPage />} />
+        </Route>
+      </Route>
 
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
