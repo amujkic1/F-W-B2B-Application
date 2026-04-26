@@ -3,7 +3,7 @@ from datetime import timedelta, datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, Query
 from services.email import send_verification_email
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from core.config import settings
 from core.security import (
@@ -54,8 +54,10 @@ def register(user_in: UserCreate, background_tasks: BackgroundTasks, db: Session
 def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
-) -> Token:
-    user = db.query(User).filter(User.email == form_data.username).first()
+) -> Any:
+    # Eager loading profila
+    user = db.query(User).options(joinedload(User.profile)).filter(User.email == form_data.username).first()
+    
     if user is None or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -63,15 +65,16 @@ def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    # Tokeni
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": str(user.id)}, expires_delta=access_token_expires
     )
-    
     refresh_token = create_refresh_token(str(user.id))
     
-    # Spremi refresh token u bazu
+    # Refresh token u bazu 
     expires_at = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+    
     db_refresh_token = UserRefreshToken(
         user_id=user.id,
         token=refresh_token,
@@ -81,7 +84,12 @@ def login(
     db.add(db_refresh_token)
     db.commit()
     
-    return Token(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer",
+        "user": user 
+    }
 
 
 @router.get("/verify-email")

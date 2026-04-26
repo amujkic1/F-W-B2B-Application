@@ -15,3 +15,20 @@ class UserRead(BaseModel):
 
     class Config:
         from_attributes = True
+
+class UserProfileSummary(BaseModel):
+    first_name: str
+    last_name: str
+    avatar_url: str | None = None 
+    position: str | None = None
+
+    class Config:
+        from_attributes = True
+
+class UserLoginData(BaseModel):
+    id: UUID
+    email: EmailStr
+    profile: UserProfileSummary | None = None
+
+    class Config:
+        from_attributes = True
