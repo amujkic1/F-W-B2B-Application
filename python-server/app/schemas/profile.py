@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from uuid import UUID
 from datetime import datetime
+from schemas.company import CompanyRead
 
 class ProfileBase(BaseModel):
     first_name: str
@@ -11,6 +12,30 @@ class ProfileBase(BaseModel):
     bio: str | None = None
     accepting_meetings: bool | None = True
     availability_note: str | None = None
+
+class ProfileRead(BaseModel):
+    id: UUID
+    first_name: str
+    last_name: str
+    position: str
+    avatar_url: str | None = None
+    linkedin_url: str | None = None
+    bio: str | None = None
+    company: CompanyRead | None = None 
+
+    class Config:
+        from_attributes = True
+
+class UserProfileSummary(BaseModel):
+    id: UUID
+    first_name: str
+    last_name: str
+    avatar_url: str | None = None 
+    position: str | None = None
+    company: CompanyRead | None = None 
+
+    class Config:
+        from_attributes = True
 
 class ProfileCreate(ProfileBase):
     user_id: UUID
@@ -26,11 +51,6 @@ class ProfileUpdate(BaseModel):
     accepting_meetings: bool | None = None
     availability_note: str | None = None
 
-class ProfileRead(ProfileBase):
-    id: UUID
-    user_id: UUID
-    created_at: datetime
-    updated_at: datetime | None = None
 
-    class Config:
-        from_attributes = True
+ProfileRead.model_rebuild()
+UserProfileSummary.model_rebuild()

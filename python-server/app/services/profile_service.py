@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from models.profile import Profile
 from schemas.profile import ProfileCreate, ProfileUpdate
@@ -23,7 +23,7 @@ def get_profile_by_id(db: Session, profile_id: UUID) -> Profile | None:
 
 
 def list_profiles(db: Session, skip: int = 0, limit: int = 100) -> list[Profile]:
-    return db.query(Profile).offset(skip).limit(limit).all()
+    return db.query(Profile).options(selectinload(Profile.company)).offset(skip).limit(limit).all()
 
 
 def update_profile(db: Session, db_profile: Profile, profile_in: ProfileUpdate) -> Profile:
