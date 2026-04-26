@@ -4,7 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from db.database import get_db
+from models.profile import Profile
 from schemas.profile import ProfileCreate, ProfileRead, ProfileUpdate
+from schemas.paginated_response import PaginatedResponse
 from services.profile_service import (
     create_profile,
     delete_profile,
@@ -25,13 +27,16 @@ def create_profile_endpoint(profile_in: ProfileCreate, db: Session = Depends(get
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
-@router.get("/", response_model=list[ProfileRead])
+@router.get("/", response_model=PaginatedResponse[ProfileRead])
 def list_profiles_endpoint(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=500),
     db: Session = Depends(get_db),
-) -> list[ProfileRead]:
-    return list_profiles(db, skip=skip, limit=limit)
+) -> PaginatedResponse[ProfileRead]:
+    total = db.query(Profile).count()
+    profiles = list_profiles(db, skip=skip, limit=limit)
+    return PaginatedResponse(items= profiles, total=total, skip=skip, limit=limit)
+    
 
 
 @router.get("/{profile_id}", response_model=ProfileRead)

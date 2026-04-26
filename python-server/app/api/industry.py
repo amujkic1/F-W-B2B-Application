@@ -4,6 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from db.database import get_db
+from models.industry import Industry
+from schemas.paginated_response import PaginatedResponse
 from schemas.industry import IndustryCreate, IndustryRead, IndustryUpdate
 from services.industry_service import (
     create_industry,
@@ -25,13 +27,15 @@ def create_industry_endpoint(industry_in: IndustryCreate, db: Session = Depends(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
-@router.get("/", response_model=list[IndustryRead])
+@router.get("/", response_model=PaginatedResponse[IndustryRead])
 def list_industries_endpoint(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=500),
     db: Session = Depends(get_db),
-) -> list[IndustryRead]:
-    return list_industries(db, skip=skip, limit=limit)
+) -> PaginatedResponse[IndustryRead]:
+    total = db.query(Industry).count()
+    industries = list_industries(db, skip=skip, limit=limit)
+    return PaginatedResponse(items=industries, total=total, skip=skip, limit=limit)
 
 
 @router.get("/{industry_id}", response_model=IndustryRead)

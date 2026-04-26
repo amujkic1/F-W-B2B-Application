@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from db.database import get_db
+from schemas.paginated_response import PaginatedResponse
 from schemas.unavailable_period import (
     UnavailablePeriodCreate,
     UnavailablePeriodRead,
@@ -32,13 +33,15 @@ def create_unavailable_period_endpoint(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
-@router.get("/", response_model=list[UnavailablePeriodRead])
+@router.get("/", response_model=PaginatedResponse[UnavailablePeriodRead])
 def list_unavailable_periods_endpoint(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=500),
     db: Session = Depends(get_db),
-) -> list[UnavailablePeriodRead]:
-    return list_unavailable_periods(db, skip=skip, limit=limit)
+) -> PaginatedResponse[UnavailablePeriodRead]:
+    total = db.query(UnavailablePeriod).count()
+    unavailablePeriods = list_unavailable_periods(db, skip=skip, limit=limit)
+    return PaginatedResponse(items=list_unavailable_periods, total=total, skip=skip, limit=limit)
 
 
 @router.get("/{unavailable_period_id}", response_model=UnavailablePeriodRead)

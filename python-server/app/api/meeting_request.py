@@ -4,6 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from db.database import get_db
+from models.meeting_request import MeetingRequest
+from schemas.paginated_response import PaginatedResponse
 from schemas.meeting_request import MeetingRequestCreate, MeetingRequestRead, MeetingRequestUpdate
 from services.meeting_request_service import (
     create_meeting_request,
@@ -28,13 +30,15 @@ def create_meeting_request_endpoint(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
-@router.get("/", response_model=list[MeetingRequestRead])
+@router.get("/", response_model=PaginatedResponse[MeetingRequestRead])
 def list_meeting_requests_endpoint(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=500),
     db: Session = Depends(get_db),
-) -> list[MeetingRequestRead]:
-    return list_meeting_requests(db, skip=skip, limit=limit)
+) -> PaginatedResponse[MeetingRequestRead]:
+    total = db.query(MeetingRequest).count()
+    meetingRequests = list_meeting_requests(db, skip=skip, limit=limit)
+    return PaginatedResponse(items=list_meeting_requests, total=total, skip=skip, limit=limit)
 
 
 @router.get("/{meeting_request_id}", response_model=MeetingRequestRead)

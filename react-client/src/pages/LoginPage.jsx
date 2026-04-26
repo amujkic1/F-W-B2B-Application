@@ -28,7 +28,7 @@ export function LoginPage() {
     mutate: login, 
     isPending, 
     error, 
-    reset // Funkcija za čišćenje error stanja ako zatreba
+    reset
   } = useLoginMutation();
 
   function handleSubmit(event) {
@@ -78,7 +78,7 @@ export function LoginPage() {
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
-                  if (error) reset(); // Briše grešku dok korisnik ponovo tipka
+                  if (error) reset(); 
                 }}
                 required
               />
