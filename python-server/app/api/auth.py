@@ -75,7 +75,8 @@ def login(
     db_refresh_token = UserRefreshToken(
         user_id=user.id,
         token=refresh_token,
-        expires_at=expires_at
+        expires_at=expires_at,
+        is_revoked=False
     )
     db.add(db_refresh_token)
     db.commit()

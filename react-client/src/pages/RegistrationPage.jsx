@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import { useRegisterMutation } from "@/queries/useRegisterMutation.js";
+import { useRegisterMutation } from "@/queries/useAuth.js";
 import { Button, buttonVariants } from "@/components/ui/button.jsx";
 import {
   Card,
