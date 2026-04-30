@@ -3,11 +3,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
-from db.database import get_db
-from models.meeting_request import MeetingRequest
-from schemas.paginated_response import PaginatedResponse
-from schemas.meeting_request import MeetingRequestCreate, MeetingRequestRead, MeetingRequestUpdate
-from services.meeting_request_service import (
+from app.db.database import get_db
+from app.models.meeting_request import MeetingRequest
+from app.schemas.paginated_response import PaginatedResponse
+from app.schemas.meeting_request import MeetingRequestCreate, MeetingRequestRead, MeetingRequestUpdate
+from app.services.meeting_request_service import (
     create_meeting_request,
     delete_meeting_request,
     get_meeting_request_by_id,

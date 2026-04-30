@@ -3,11 +3,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
-from db.database import get_db
-from models.industry import Industry
-from schemas.paginated_response import PaginatedResponse
-from schemas.industry import IndustryCreate, IndustryRead, IndustryUpdate
-from services.industry_service import (
+from app.db.database import get_db
+from app.models.industry import Industry
+from app.schemas.paginated_response import PaginatedResponse
+from app.schemas.industry import IndustryCreate, IndustryRead, IndustryUpdate
+from app.services.industry_service import (
     create_industry,
     delete_industry,
     get_industry_by_id,

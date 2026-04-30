@@ -2,7 +2,7 @@ import uuid
 from sqlalchemy import String, ForeignKey, Enum
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from db.database import Base
+from app.db.database import Base
 
 class Company(Base):
     __tablename__ = "companies"

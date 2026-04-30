@@ -3,8 +3,8 @@ from uuid import UUID
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from models.industry import Industry
-from schemas.industry import IndustryCreate, IndustryUpdate
+from app.models.industry import Industry
+from app.schemas.industry import IndustryCreate, IndustryUpdate
 
 
 def _industry_name_exists(db: Session, name: str, excluded_id: UUID | None = None) -> bool:

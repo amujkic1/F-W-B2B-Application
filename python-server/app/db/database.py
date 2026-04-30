@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy import DateTime, create_engine, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
-from core.config import settings 
+from app.core.config import settings 
 
 SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL
 

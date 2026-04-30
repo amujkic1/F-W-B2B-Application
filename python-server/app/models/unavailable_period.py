@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import String, ForeignKey, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
-from db.database import Base
+from app.db.database import Base
 
 
 class UnavailablePeriod(Base):

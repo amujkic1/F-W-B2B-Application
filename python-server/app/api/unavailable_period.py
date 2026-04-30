@@ -3,14 +3,15 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
-from db.database import get_db
-from schemas.paginated_response import PaginatedResponse
-from schemas.unavailable_period import (
+from app.db.database import get_db
+from app.schemas.paginated_response import PaginatedResponse
+from app.schemas.unavailable_period import (
     UnavailablePeriodCreate,
     UnavailablePeriodRead,
     UnavailablePeriodUpdate,
 )
-from services.unavailable_period_service import (
+from app.models.unavailable_period import UnavailablePeriod
+from app.services.unavailable_period_service import (
     create_unavailable_period,
     delete_unavailable_period,
     get_unavailable_period_by_id,

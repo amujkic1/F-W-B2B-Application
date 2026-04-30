@@ -2,8 +2,8 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session, selectinload
 
-from models.profile import Profile
-from schemas.profile import ProfileCreate, ProfileUpdate
+from app.models.profile import Profile
+from app.schemas.profile import ProfileCreate, ProfileUpdate
 
 
 def create_profile(db: Session, profile_in: ProfileCreate) -> Profile:

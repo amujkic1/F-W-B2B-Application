@@ -5,19 +5,19 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from db.database import Base
-from models.user import User
-from models.profile import Profile
-from models.availability import Availability
-from models.company import Company
-from models.company_type import CompanyType
-from models.industry import Industry
-from models.meeting_request import MeetingRequest
-from models.profile_tag import ProfileTag
-from models.profile import Profile
-from models.tag import Tag
-from models.user_refresh_tokens import UserRefreshToken
-from models.unavailable_period import UnavailablePeriod
+from app.db.database import Base
+from app.models.user import User
+from app.models.profile import Profile
+from app.models.availability import Availability
+from app.models.company import Company
+from app.models.company_type import CompanyType
+from app.models.industry import Industry
+from app.models.meeting_request import MeetingRequest
+from app.models.profile_tag import ProfileTag
+from app.models.profile import Profile
+from app.models.tag import Tag
+from app.models.user_refresh_tokens import UserRefreshToken
+from app.models.unavailable_period import UnavailablePeriod
 from dotenv import load_dotenv
 import os
 load_dotenv()

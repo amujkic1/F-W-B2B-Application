@@ -1,12 +1,12 @@
 from datetime import timedelta, datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, Query
-from services.email import send_verification_email
+from app.services.email import send_verification_email
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session, joinedload
 
-from core.config import settings
-from core.security import (
+from app.core.config import settings
+from app.core.security import (
     create_access_token, 
     hash_password, 
     verify_password, 
@@ -14,12 +14,13 @@ from core.security import (
     create_refresh_token,
     verify_refresh_token
 )
-from db.database import get_db
-from models.user import User
-from models.user_refresh_tokens import UserRefreshToken
-from schemas.token import Token
-from schemas.user import UserCreate, UserRead
+from app.db.database import get_db
+from app.models.user import User
+from app.models.user_refresh_tokens import UserRefreshToken
+from app.schemas.token import Token
+from app.schemas.user import UserCreate, UserRead
 from jose import JWTError, jwt
+from typing import Any
 
 
 router = APIRouter(prefix="/api/auth", tags=["authentication"])

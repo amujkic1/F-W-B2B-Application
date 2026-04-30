@@ -2,8 +2,8 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from models.unavailable_period import UnavailablePeriod
-from schemas.unavailable_period import UnavailablePeriodCreate, UnavailablePeriodUpdate
+from app.models.unavailable_period import UnavailablePeriod
+from app.schemas.unavailable_period import UnavailablePeriodCreate, UnavailablePeriodUpdate
 
 
 def _validate_time_window(start_datetime, end_datetime) -> None:

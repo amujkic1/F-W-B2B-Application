@@ -3,11 +3,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
-from db.database import get_db
-from models.profile import Profile
-from schemas.profile import ProfileCreate, ProfileRead, ProfileUpdate
-from schemas.paginated_response import PaginatedResponse
-from services.profile_service import (
+from app.db.database import get_db
+from app.models.profile import Profile
+from app.schemas.profile import ProfileCreate, ProfileRead, ProfileUpdate
+from app.schemas.paginated_response import PaginatedResponse
+from app.services.profile_service import (
     create_profile,
     delete_profile,
     get_profile_by_id,

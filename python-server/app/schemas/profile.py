@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from uuid import UUID
 from datetime import datetime
-from schemas.company import CompanyRead
+from app.schemas.company import CompanyRead
 
 class ProfileBase(BaseModel):
     first_name: str

@@ -2,8 +2,8 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from models.meeting_request import MeetingRequest
-from schemas.meeting_request import MeetingRequestCreate, MeetingRequestUpdate
+from app.models.meeting_request import MeetingRequest
+from app.schemas.meeting_request import MeetingRequestCreate, MeetingRequestUpdate
 
 
 def _validate_meeting_window(start_at, end_at) -> None:

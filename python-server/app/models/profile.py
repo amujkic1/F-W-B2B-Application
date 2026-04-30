@@ -2,7 +2,7 @@ import uuid
 from sqlalchemy import String, Text, ForeignKey, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from db.database import Base
+from app.db.database import Base
 
 class Profile(Base):
     __tablename__ = "profiles"

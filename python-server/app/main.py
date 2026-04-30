@@ -1,23 +1,23 @@
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from core.config import settings
-from db.database import engine, Base
-from models.user import User
-from models.profile import Profile
-from models.industry import Industry
-from models.tag import Tag
-from models.profile_tag import ProfileTag
-from models.availability import Availability
-from models.unavailable_period import UnavailablePeriod
-from models.meeting_request import MeetingRequest
-from models.company import Company
-from models.company_type import CompanyType
-from api.auth import router as auth_router
-from api.meeting_request import router as meeting_request_router
-from api.profile import router as profile_router
-from api.industry import router as industry_router
-from api.unavailable_period import router as unavailable_period_router
-from api.deps import get_current_user
+from app.core.config import settings
+from app.db.database import engine, Base
+from app.models.user import User
+from app.models.profile import Profile
+from app.models.industry import Industry
+from app.models.tag import Tag
+from app.models.profile_tag import ProfileTag
+from app.models.availability import Availability
+from app.models.unavailable_period import UnavailablePeriod
+from app.models.meeting_request import MeetingRequest
+from app.models.company import Company
+from app.models.company_type import CompanyType
+from app.api.auth import router as auth_router
+from app.api.meeting_request import router as meeting_request_router
+from app.api.profile import router as profile_router
+from app.api.industry import router as industry_router
+from app.api.unavailable_period import router as unavailable_period_router
+from app.api.deps import get_current_user
 
 Base.metadata.create_all(bind=engine)
 

@@ -3,7 +3,7 @@ from datetime import time
 from sqlalchemy import ForeignKey, Time, Integer, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
-from db.database import Base
+from app.db.database import Base
 
 
 class Availability(Base):
