@@ -1,30 +1,33 @@
 import uuid
-from sqlalchemy import Column, String, Text, ForeignKey, DateTime, Enum, func
+from sqlalchemy import String, Text, ForeignKey, Boolean
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from db.database import Base
 
 class Profile(Base):
     __tablename__ = "profiles"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), unique=True, nullable=False)
-    
-    first_name = Column(String, nullable=False)
-    last_name = Column(String, nullable=False)
-    headline = Column(String, nullable=True)
-    bio = Column(Text, nullable=True)
-    city = Column(String, nullable=True)
-    country = Column(String, server_default="BiH", default="BiH")
-    profile_image_url = Column(String, nullable=True)
-    
-    looking_for = Column(
-        Enum('client', 'job', 'partner', 'networking', name='looking_for_enum'),
-        nullable=True
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id"),
+        unique=True,
+        nullable=False,
     )
 
-    created_at = Column(DateTime, server_default=func.now())
-    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+    first_name: Mapped[str] = mapped_column(String, nullable=False)
+    last_name: Mapped[str] = mapped_column(String, nullable=False)
+    position: Mapped[str] = mapped_column(String, nullable=False)
+    avatar_url: Mapped[str | None] = mapped_column(String, nullable=True)
+    linkedin_url: Mapped[str | None] = mapped_column(String, nullable=True)
+    bio: Mapped[str | None] = mapped_column(Text, nullable=True)
+    accepting_meetings: Mapped[bool | None] = mapped_column(Boolean, default=True)
+    availability_note : Mapped[str | None] = mapped_column(String(255), nullable=True)
 
-    user = relationship("User", back_populates="profile")
+    user: Mapped["User"] = relationship("User", back_populates="profile")
+    company: Mapped["Company | None"] = relationship(
+        "Company",
+        back_populates="profile",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )

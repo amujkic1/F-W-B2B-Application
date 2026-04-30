@@ -1,20 +1,34 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from uuid import UUID
 from datetime import datetime
-from typing import Optional, Literal
 
 class UserCreate(BaseModel):
     email: EmailStr
-    password: str  
-    account_type: Literal['individual', 'company']
+    password: str = Field(..., min_length=8, max_length=72, description="Password must be between 8 and 72 characters")
 
 class UserRead(BaseModel):
     id: UUID
     email: EmailStr
-    account_type: str
     status: str
     created_at: datetime
-    email_verified_at: Optional[datetime] = None
+    email_verified_at: datetime | None = None
+
+    class Config:
+        from_attributes = True
+
+class UserProfileSummary(BaseModel):
+    first_name: str
+    last_name: str
+    avatar_url: str | None = None 
+    position: str | None = None
+
+    class Config:
+        from_attributes = True
+
+class UserLoginData(BaseModel):
+    id: UUID
+    email: EmailStr
+    profile: UserProfileSummary | None = None
 
     class Config:
         from_attributes = True

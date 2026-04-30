@@ -10,6 +10,7 @@ from models.user import User
 from models.profile import Profile
 from models.availability import Availability
 from models.company import Company
+from models.company_type import CompanyType
 from models.industry import Industry
 from models.meeting_request import MeetingRequest
 from models.profile_tag import ProfileTag

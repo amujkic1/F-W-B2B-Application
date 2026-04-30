@@ -1,17 +1,22 @@
 import uuid
-from sqlalchemy import Column, String, DateTime, Enum, func
+from sqlalchemy import String, Enum
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Mapped, mapped_column
 from db.database import Base
 
 
 class Tag(Base):
     __tablename__ = "tags"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    name = Column(String, unique=True, nullable=False)
-    slug = Column(String, unique=True, nullable=False)
-    type = Column(
-        Enum('skill', 'service', 'interest', name='tag_type_enum'),
-        nullable=False
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+        index=True,
     )
-    created_at = Column(DateTime, server_default=func.now())
+    name: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    slug: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    type: Mapped[str] = mapped_column(
+        Enum('skill', 'service', 'interest', name='tag_type_enum'),
+        nullable=False,
+    )

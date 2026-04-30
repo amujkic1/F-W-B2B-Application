@@ -1,30 +1,35 @@
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, Enum, Boolean, func
+from sqlalchemy import String, DateTime, Enum, Boolean
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from db.database import Base
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    
-    email = Column(String, unique=True, index=True, nullable=False)
-    password_hash = Column(String, nullable=False)
-    
-    account_type = Column(
-        Enum('individual', 'company', name='account_type_enum'), 
-        nullable=False
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+        index=True,
     )
-    status = Column(
+
+    email: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
+    password_hash: Mapped[str] = mapped_column(String, nullable=False)
+
+    status: Mapped[str] = mapped_column(
         Enum('active', 'inactive', 'blocked', name='user_status_enum'), 
         default='inactive', 
-        nullable=False
+        nullable=False,
     )
-    is_verified = Column(Boolean, default=False)
-    email_verified_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=func.now(), server_default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    is_verified: Mapped[bool | None] = mapped_column(Boolean, default=False, nullable=True)
+    email_verified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
-    profile = relationship("Profile", back_populates="user", uselist=False)
+    # Relacije (1:1 prema Profile)
+    profile: Mapped["Profile | None"] = relationship(
+        "Profile",
+        back_populates="user",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )

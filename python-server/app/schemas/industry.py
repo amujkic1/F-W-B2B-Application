@@ -12,6 +12,11 @@ class IndustryCreate(IndustryBase):
     pass
 
 
+class IndustryUpdate(BaseModel):
+    name: str | None = None
+    slug: str | None = None
+
+
 class IndustryRead(IndustryBase):
     id: UUID
     created_at: datetime
