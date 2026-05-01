@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel  
 from app.services.base import BaseService
 from app.schemas.paginated_response import PaginatedResponse 
@@ -24,35 +24,36 @@ class BaseRouter[Model, ReadSchema, CreateSchema: BaseModel, UpdateSchema: BaseM
 
     def _setup_routes(self):
         @self.router.get("/", response_model=PaginatedResponse[self.read_schema])
-        def read_all(
+        async def read_all(
             skip: int = 0,
             limit: int = 10,
             username: str | None = None, 
-            db: Session = Depends(get_db)
+            db: AsyncSession = Depends(get_db) # Switch to AsyncSession
         ):
-            # The service now returns the dict required by PaginatedResponse
-            return self.service.get_all(db, skip=skip, limit=limit, username=username)
+            # Await the service call
+            return await self.service.get_all(db, skip=skip, limit=limit, username=username)
 
         @self.router.get("/{id}", response_model=self.read_schema)
-        def read_by_id(id: int, db: Session = Depends(get_db)):
-            item = self.service.get(db, id=id)
+        async def read_by_id(id: int, db: AsyncSession = Depends(get_db)):
+            item = await self.service.get(db, id=id)
             if not item:
                 raise HTTPException(status_code=404, detail="Resource not found")
             return item
 
         @self.router.post("/", response_model=self.read_schema, status_code=201)
-        def create(obj_in: self.create_schema, db: Session = Depends(get_db)):
-            return self.service.create(db, obj_in=obj_in)
+        async def create(obj_in: self.create_schema, db: AsyncSession = Depends(get_db)):
+            return await self.service.create(db, obj_in=obj_in)
 
         @self.router.put("/{id}", response_model=self.read_schema)
-        def update(id: int, obj_in: self.update_schema, db: Session = Depends(get_db)):
-            item = self.service.get(db, id=id)
+        async def update(id: int, obj_in: self.update_schema, db: AsyncSession = Depends(get_db)):
+            item = await self.service.get(db, id=id)
             if not item:
                 raise HTTPException(status_code=404, detail="Resource not found")
-            return self.service.update(db, db_obj=item, obj_in=obj_in)
+            return await self.service.update(db, db_obj=item, obj_in=obj_in)
 
         @self.router.delete("/{id}", status_code=204)
-        def delete(id: int, db: Session = Depends(get_db)):
-            if not self.service.remove(db, id=id):
+        async def delete(id: int, db: AsyncSession = Depends(get_db)):
+            success = await self.service.remove(db, id=id)
+            if not success:
                 raise HTTPException(status_code=404, detail="Resource not found")
             return None

@@ -1,25 +1,34 @@
 from typing import Any, Union
-from sqlalchemy.orm import Session
+from sqlalchemy import select, func, update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 
 class BaseService[Model, CreateSchema: BaseModel, UpdateSchema: BaseModel]:
     def __init__(self, model: type[Model]):
         self.model = model
 
-    def get(self, db: Session, id: int) -> Model | None:
-        return db.query(self.model).filter(self.model.id == id).first()
+    async def get(self, db: AsyncSession, id: int) -> Model | None:
+        result = await db.execute(select(self.model).where(self.model.id == id))
+        return result.scalars().first()
 
-    def get_all(
-        self, db: Session, skip: int = 0, limit: int = 10, **filters: object
+    async def get_all(
+        self, db: AsyncSession, skip: int = 0, limit: int = 10, options: list = None, **filters: object
     ) -> dict[str, Any]:
-        query = db.query(self.model)
+        query = select(self.model)
+
+        if options:
+            query = query.options(*options)
         
         if filters:
             active_filters = {k: v for k, v in filters.items() if v is not None}
             query = query.filter_by(**active_filters)
             
-        total = query.count()
-        items = query.offset(skip).limit(limit).all()
+        count_query = select(func.count()).select_from(query.subquery())
+        count_result = await db.execute(count_query)
+        total = count_result.scalar() or 0
+        
+        items_result = await db.execute(query.offset(skip).limit(limit))
+        items = items_result.scalars().all()
         
         return {
             "items": items,
@@ -28,28 +37,30 @@ class BaseService[Model, CreateSchema: BaseModel, UpdateSchema: BaseModel]:
             "limit": limit
         }
 
-    def create(self, db: Session, *, obj_in: CreateSchema) -> Model:
+    async def create(self, db: AsyncSession, *, obj_in: CreateSchema) -> Model:
         db_obj = self.model(**obj_in.model_dump())
         db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
+        await db.commit()
+        await db.refresh(db_obj)
         return db_obj
 
-    def update(
-        self, db: Session, *, db_obj: Model, obj_in: Union[UpdateSchema, dict[str, Any]]
+    async def update(
+        self, db: AsyncSession, *, db_obj: Model, obj_in: Union[UpdateSchema, dict[str, Any]]
     ) -> Model:
         update_data = obj_in if isinstance(obj_in, dict) else obj_in.model_dump(exclude_unset=True)
         for field, value in update_data.items():
             setattr(db_obj, field, value)
         
         db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
+        await db.commit()
+        await db.refresh(db_obj)
         return db_obj
 
-    def remove(self, db: Session, *, id: int) -> Model | None:
-        obj = db.query(self.model).get(id)
+    async def remove(self, db: AsyncSession, *, id: int) -> Model | None:
+        result = await db.execute(select(self.model).where(self.model.id == id))
+        obj = result.scalars().first()
+        
         if obj:
-            db.delete(obj)
-            db.commit()
+            await db.delete(obj)
+            await db.commit()
         return obj

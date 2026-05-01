@@ -1,10 +1,14 @@
 from datetime import timedelta, datetime, timezone
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, Query
-from app.services.email import send_verification_email
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
+from jose import JWTError, jwt
 
+from app.services.email import send_verification_email
 from app.core.config import settings
 from app.core.security import (
     create_access_token, 
@@ -19,16 +23,19 @@ from app.models.user import User
 from app.models.user_refresh_tokens import UserRefreshToken
 from app.schemas.token import Token
 from app.schemas.user import UserCreate, UserRead
-from jose import JWTError, jwt
-from typing import Any
-
 
 router = APIRouter(prefix="/api/auth", tags=["authentication"])
 
-
 @router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
-def register(user_in: UserCreate, background_tasks: BackgroundTasks, db: Session = Depends(get_db)) -> UserRead:
-    existing_user = db.query(User).filter(User.email == user_in.email).first()
+async def register(
+    user_in: UserCreate, 
+    background_tasks: BackgroundTasks, 
+    db: AsyncSession = Depends(get_db)
+) -> Any:
+    # Use await and select()
+    result = await db.execute(select(User).where(User.email == user_in.email))
+    existing_user = result.scalars().first()
+    
     if existing_user is not None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -39,25 +46,26 @@ def register(user_in: UserCreate, background_tasks: BackgroundTasks, db: Session
         email=user_in.email,
         password_hash=hash_password(user_in.password),
     )
-    print(user)
+    
     db.add(user)
-    db.commit()
-    db.refresh(user)
+    await db.commit()
+    await db.refresh(user)
 
     token = create_verification_token(user.email)
-
     background_tasks.add_task(send_verification_email, user.email, token)
 
     return user
 
-
 @router.post("/login", response_model=Token)
-def login(
+async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ) -> Any:
-    # Eager loading profila
-    user = db.query(User).options(joinedload(User.profile)).filter(User.email == form_data.username).first()
+    # Eager loading with selectinload is often safer in async than joinedload, 
+    # but joinedload works here for a 1-to-1 profile
+    query = select(User).options(joinedload(User.profile)).where(User.email == form_data.username)
+    result = await db.execute(query)
+    user = result.scalars().first()
     
     if user is None or not verify_password(form_data.password, user.password_hash):
         raise HTTPException(
@@ -66,14 +74,12 @@ def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # Tokeni
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": str(user.id)}, expires_delta=access_token_expires
     )
     refresh_token = create_refresh_token(str(user.id))
     
-    # Refresh token u bazu 
     expires_at = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     
     db_refresh_token = UserRefreshToken(
@@ -83,7 +89,7 @@ def login(
         is_revoked=False
     )
     db.add(db_refresh_token)
-    db.commit()
+    await db.commit()
     
     return {
         "access_token": access_token,
@@ -92,9 +98,8 @@ def login(
         "user": user 
     }
 
-
 @router.get("/verify-email")
-def verify_email(token: str, db: Session = Depends(get_db)):
+async def verify_email(token: str, db: AsyncSession = Depends(get_db)):
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         email = payload.get("sub")
@@ -102,7 +107,9 @@ def verify_email(token: str, db: Session = Depends(get_db)):
         if payload.get("type") != "verification":
             raise HTTPException(status_code=400, detail="Invalid token type")
             
-        user = db.query(User).filter(User.email == email).first()
+        result = await db.execute(select(User).where(User.email == email))
+        user = result.scalars().first()
+        
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         
@@ -110,19 +117,18 @@ def verify_email(token: str, db: Session = Depends(get_db)):
             return {"msg": "Email je već ranije verifikovan."}
 
         user.is_verified = True
-        db.commit()
+        await db.commit()
         
         return {"msg": "Uspješno ste verifikovali email! Sada se možete ulogovati."}
         
     except JWTError:
         raise HTTPException(status_code=400, detail="Link je neispravan ili je istekao.")
 
-
 @router.post("/refresh", response_model=Token)
-def refresh(refresh_token: str = Query(..., description="Refresh token"), db: Session = Depends(get_db)):
-    """
-    Generiše novi access token koristeći refresh token
-    """
+async def refresh(
+    refresh_token: str = Query(..., description="Refresh token"), 
+    db: AsyncSession = Depends(get_db)
+):
     user_id = verify_refresh_token(refresh_token)
     
     if not user_id:
@@ -132,11 +138,12 @@ def refresh(refresh_token: str = Query(..., description="Refresh token"), db: Se
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    # Provjeri da li je refresh token u bazi i nije revoked
-    db_token = db.query(UserRefreshToken).filter(
+    query = select(UserRefreshToken).where(
         UserRefreshToken.token == refresh_token,
         UserRefreshToken.is_revoked == False
-    ).first()
+    )
+    result = await db.execute(query)
+    db_token = result.scalars().first()
     
     if not db_token or db_token.expires_at < datetime.now(timezone.utc):
         raise HTTPException(
@@ -144,15 +151,15 @@ def refresh(refresh_token: str = Query(..., description="Refresh token"), db: Se
             detail="Refresh token has expired or been revoked"
         )
     
-    # Provjeri da li korisnik postoji i je aktivan
-    user = db.query(User).filter(User.id == user_id).first()
+    result = await db.execute(select(User).where(User.id == user_id))
+    user = result.scalars().first()
+    
     if not user or user.status != "active":
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User is not active"
         )
     
-    # Generiši novi access token
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     new_access_token = create_access_token(
         data={"sub": str(user.id)}, expires_delta=access_token_expires
@@ -164,15 +171,13 @@ def refresh(refresh_token: str = Query(..., description="Refresh token"), db: Se
         token_type="bearer"
     )
 
-
 @router.post("/logout")
-def logout(refresh_token: str = Query(..., description="Refresh token"), db: Session = Depends(get_db)):
-    """
-    Revokira refresh token (logout korisnika)
-    """
-    db_token = db.query(UserRefreshToken).filter(
-        UserRefreshToken.token == refresh_token
-    ).first()
+async def logout(
+    refresh_token: str = Query(..., description="Refresh token"), 
+    db: AsyncSession = Depends(get_db)
+):
+    result = await db.execute(select(UserRefreshToken).where(UserRefreshToken.token == refresh_token))
+    db_token = result.scalars().first()
     
     if not db_token:
         raise HTTPException(
@@ -181,6 +186,6 @@ def logout(refresh_token: str = Query(..., description="Refresh token"), db: Ses
         )
     
     db_token.is_revoked = True
-    db.commit()
+    await db.commit()
     
     return {"msg": "Successfully logged out"}

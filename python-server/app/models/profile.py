@@ -30,4 +30,5 @@ class Profile(Base):
         back_populates="profile",
         uselist=False,
         cascade="all, delete-orphan",
+        lazy="selectin",
     )

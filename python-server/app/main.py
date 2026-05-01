@@ -19,8 +19,6 @@ from app.api.industry import router as industry_router
 from app.api.unavailable_period import router as unavailable_period_router
 from app.api.deps import get_current_user
 
-Base.metadata.create_all(bind=engine)
-
 app = FastAPI(title=settings.PROJECT_NAME)
 
 # CORS middleware
