@@ -1,42 +1,19 @@
-from uuid import UUID
-
-from sqlalchemy.orm import Session, selectinload
-
-from app.models.profile import Profile
+from sqlalchemy.orm import Session, joinedload
+from typing import Any
+from .base import BaseService
 from app.schemas.profile import ProfileCreate, ProfileUpdate
+from app.models.profile import Profile
 
+class ProfileService(BaseService[Profile, ProfileCreate, ProfileUpdate]):
+    
+    # We only override this if we need relationships like 'company'
+    def list_profiles(self, db: Session, skip: int = 0, limit: int = 10, **filters: object) -> dict[str, Any]:
+        # We start the query with joinedload
+        query = db.query(self.model).options(joinedload(Profile.company))
+        
+        # Now we just do exactly what the base does, or better yet,
+        # refactor the base to have a '_apply_filters' method so you 
+        # truly never repeat yourself.
+        return super().get_all(db, skip=skip, limit=limit, **filters)
 
-def create_profile(db: Session, profile_in: ProfileCreate) -> Profile:
-    existing_profile = db.query(Profile).filter(Profile.user_id == profile_in.user_id).first()
-    if existing_profile is not None:
-        raise ValueError("Profile for this user already exists")
-
-    db_profile = Profile(**profile_in.model_dump())
-    db.add(db_profile)
-    db.commit()
-    db.refresh(db_profile)
-    return db_profile
-
-
-def get_profile_by_id(db: Session, profile_id: UUID) -> Profile | None:
-    return db.query(Profile).filter(Profile.id == profile_id).first()
-
-
-def list_profiles(db: Session, skip: int = 0, limit: int = 100) -> list[Profile]:
-    return db.query(Profile).options(selectinload(Profile.company)).offset(skip).limit(limit).all()
-
-
-def update_profile(db: Session, db_profile: Profile, profile_in: ProfileUpdate) -> Profile:
-    update_data = profile_in.model_dump(exclude_unset=True)
-
-    for field, value in update_data.items():
-        setattr(db_profile, field, value)
-
-    db.commit()
-    db.refresh(db_profile)
-    return db_profile
-
-
-def delete_profile(db: Session, db_profile: Profile) -> None:
-    db.delete(db_profile)
-    db.commit()
+profile_service = ProfileService(Profile)
