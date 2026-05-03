@@ -15,6 +15,7 @@ from app.models.company_type import CompanyType
 from app.api.auth import router as auth_router
 from app.api.meeting_request import router as meeting_request_router
 from app.api.profile import router as profile_router
+from app.api.company import router as company_router
 from app.api.industry import router as industry_router
 from app.api.unavailable_period import router as unavailable_period_router
 from app.api.deps import get_current_user
@@ -35,6 +36,7 @@ app.include_router(meeting_request_router, dependencies=[Depends(get_current_use
 app.include_router(profile_router, dependencies=[Depends(get_current_user)])
 app.include_router(industry_router, dependencies=[Depends(get_current_user)])
 app.include_router(unavailable_period_router, dependencies=[Depends(get_current_user)])
+app.include_router(company_router, dependencies=[Depends(get_current_user)])
 
 @app.get("/info", dependencies=[Depends(get_current_user)])
 def get_info():
