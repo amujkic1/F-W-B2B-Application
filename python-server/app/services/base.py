@@ -12,7 +12,7 @@ class BaseService[Model, CreateSchema: BaseModel, UpdateSchema: BaseModel]:
         return result.scalars().first()
 
     async def get_all(
-        self, db: AsyncSession, skip: int = 0, limit: int = 10, options: list = None, **filters: object
+        self, db: AsyncSession, skip: int = 0, limit: int = 10, options: list = None, **filters
     ) -> dict[str, Any]:
         query = select(self.model)
 
@@ -20,9 +20,13 @@ class BaseService[Model, CreateSchema: BaseModel, UpdateSchema: BaseModel]:
             query = query.options(*options)
         
         if filters:
-            active_filters = {k: v for k, v in filters.items() if v is not None}
-            query = query.filter_by(**active_filters)
-            
+            active_filters = {
+                k: v for k, v in filters.items() 
+                if v is not None and hasattr(self.model, k)
+            }
+            if active_filters:
+                query = query.filter_by(**active_filters)
+                
         count_query = select(func.count()).select_from(query.subquery())
         count_result = await db.execute(count_query)
         total = count_result.scalar() or 0

@@ -1,4 +1,4 @@
-from app.schemas.profile import ProfileCreate, ProfileRead, ProfileUpdate
+from app.schemas.profile import ProfileCreate, ProfileRead, ProfileUpdate, ProfileFilter
 from app.services import profile_service
 from .base import BaseRouter
 
@@ -8,6 +8,7 @@ profile_router_container = BaseRouter(
     read_schema=ProfileRead,
     create_schema=ProfileCreate,
     update_schema=ProfileUpdate,
+    filter_schema=ProfileFilter,
     prefix="/api/profiles",
     tags=["profiles"]
 )
