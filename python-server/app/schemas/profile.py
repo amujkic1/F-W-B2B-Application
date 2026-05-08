@@ -15,6 +15,7 @@ class ProfileBase(BaseModel):
 
 class ProfileRead(BaseModel):
     id: UUID
+    user_id: UUID
     first_name: str
     last_name: str
     position: str
@@ -55,7 +56,7 @@ class ProfileFilter(BaseModel):
     first_name: str | None = None
     last_name: str | None = None
     position: str | None = None
-    accepting_meetings: bool | None = True
+    accepting_meetings: bool | None = None
 
 ProfileRead.model_rebuild()
 UserProfileSummary.model_rebuild()

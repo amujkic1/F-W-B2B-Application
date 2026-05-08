@@ -41,7 +41,7 @@ class MeetingRequestUpdate(BaseModel):
 class MeetingRequestRead(MeetingRequestBase):
     id: UUID
     created_at: datetime
-    updated_at: datetime
+    updated_at: datetime | None = None
 
     class Config:
         from_attributes = True
