@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 
 import { MatchmakingList } from "@/components/matchmaking/MatchmakingList.jsx";
+import { RequestMeetingModal } from "@/components/matchmaking/RequestMeetingModal.jsx";
 import { TopBar } from "@/components/matchmaking/TopBar.jsx";
 
 const INDUSTRIES = [
@@ -97,6 +98,8 @@ const MATCHES = [
 export function MatchmakingPage() {
   const [search, setSearch] = useState("");
   const [showAvailableOnly, setShowAvailableOnly] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState(null);
+  const [isRequestMeetingOpen, setIsRequestMeetingOpen] = useState(false);
   const [filters, setFilters] = useState({
     industry: "all",
     goal: "all",
@@ -139,6 +142,11 @@ export function MatchmakingPage() {
     }));
   }
 
+  function handleRequestMeeting(match) {
+    setSelectedMatch(match);
+    setIsRequestMeetingOpen(true);
+  }
+
   return (
     <div className="animate-reveal">
       <div className="mb-6 space-y-2">
@@ -164,7 +172,16 @@ export function MatchmakingPage() {
         companyTypes={COMPANY_TYPES}
       />
 
-      <MatchmakingList matches={filteredMatches} />
+      <MatchmakingList
+        matches={filteredMatches}
+        onRequestMeeting={handleRequestMeeting}
+      />
+
+      <RequestMeetingModal
+        match={selectedMatch}
+        open={isRequestMeetingOpen}
+        onOpenChange={setIsRequestMeetingOpen}
+      />
     </div>
   );
 }

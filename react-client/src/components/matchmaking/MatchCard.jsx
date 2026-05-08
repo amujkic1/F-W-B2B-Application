@@ -15,7 +15,7 @@ function initials(name) {
     .toUpperCase()
 }
 
-export function MatchCard({ match }) {
+export function MatchCard({ match, onRequestMeeting }) {
   return (
     <Card className="w-full hover:translate-y-0">
       <CardContent className="px-4 pb-4 pt-4 sm:px-5 lg:px-6 lg:pb-6 lg:pt-6">
@@ -76,7 +76,12 @@ export function MatchCard({ match }) {
           <Separator orientation="vertical" className="hidden lg:block lg:h-24" />
 
           <div className="flex w-full flex-col gap-2 lg:w-auto lg:min-w-[180px]">
-            <Button disabled={!match.available}>Request Meeting</Button>
+            <Button
+              disabled={!match.available}
+              onClick={() => onRequestMeeting?.(match)}
+            >
+              Request Meeting
+            </Button>
             <Button variant="outline">Send Message</Button>
           </div>
         </div>
