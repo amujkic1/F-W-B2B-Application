@@ -6,12 +6,14 @@ import { Dashboard } from "@/pages/Dashboard";
 import { LoginPage } from "@/pages/LoginPage.jsx";
 import { MatchmakingPage } from "@/pages/MatchmakingPage.jsx";
 import { RegistrationPage } from "@/pages/RegistrationPage.jsx";
+import { HomePage } from "@/pages/HomePage.jsx";
 
 function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegistrationPage />} />
+      <Route path="/" element={<HomePage />} />
 
       <Route element={<ProtectedRoute />}>
         <Route element={<Layout />}>
@@ -20,7 +22,6 @@ function AppRoutes() {
         </Route>
       </Route>
 
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );

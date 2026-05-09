@@ -1,6 +1,6 @@
 import { MatchCard } from '@/components/matchmaking/MatchCard.jsx'
 
-export function MatchmakingList({ matches }) {
+export function MatchmakingList({ matches, onRequestMeeting }) {
   if (!matches.length) {
     return (
       <div className="rounded-[1.25rem] border border-input/80 bg-card/95 px-5 py-10 text-center shadow-sm">
@@ -17,7 +17,11 @@ export function MatchmakingList({ matches }) {
   return (
     <div className="space-y-4">
       {matches.map((match) => (
-        <MatchCard key={match.id} match={match} />
+        <MatchCard
+          key={match.id}
+          match={match}
+          onRequestMeeting={onRequestMeeting}
+        />
       ))}
     </div>
   )

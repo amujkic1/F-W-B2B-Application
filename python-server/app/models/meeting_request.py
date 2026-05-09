@@ -33,8 +33,14 @@ class MeetingRequest(Base):
     )
     location_text: Mapped[str | None] = mapped_column(String, nullable=True)
     meeting_link: Mapped[str | None] = mapped_column(String, nullable=True)
-    requested_start_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    requested_end_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    requested_start_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), 
+        nullable=False
+    )
+    requested_end_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), 
+        nullable=False
+    )
     status: Mapped[str] = mapped_column(
         Enum('pending', 'accepted', 'rejected', 'cancelled', 'completed', name='meeting_request_status_enum'),
         nullable=False,

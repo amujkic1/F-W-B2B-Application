@@ -1,15 +1,13 @@
 import { useMemo, useState } from "react";
 
 import { MatchmakingList } from "@/components/matchmaking/MatchmakingList.jsx";
+import { profileToMatch } from "@/components/matchmaking/profileToMatch.js";
+import { RequestMeetingModal } from "@/components/matchmaking/RequestMeetingModal.jsx";
 import { TopBar } from "@/components/matchmaking/TopBar.jsx";
+import { useProfiles } from "@/queries/useProfiles.js";
 
 const INDUSTRIES = [
   { value: "all", label: "All Industries" },
-  { value: "manufacturing", label: "Manufacturing" },
-  { value: "fintech", label: "Fintech" },
-  { value: "software", label: "Software" },
-  { value: "logistics", label: "Logistics" },
-  { value: "consulting", label: "Consulting" },
 ];
 
 const GOALS = [
@@ -20,93 +18,31 @@ const GOALS = [
 
 const COMPANY_TYPES = [
   { value: "all", label: "All Company Types" },
-  { value: "enterprise", label: "Enterprise" },
-  { value: "scaleup", label: "Scale-up" },
-  { value: "agency", label: "Agency" },
-  { value: "distributor", label: "Distributor" },
-];
-
-const MATCHES = [
-  {
-    id: 1,
-    name: "Mila Novak",
-    title: "Head of Partnerships",
-    company: "Northbridge Systems",
-    industry: "software",
-    goal: "seeking",
-    companyType: "enterprise",
-    available: true,
-    goalText:
-      "Looking for strategic partners for the DACH market expansion and long-term reseller channels.",
-    tags: ["SaaS", "DACH", "Reseller Program", "Enterprise"],
-  },
-  {
-    id: 2,
-    name: "Emir Hadzic",
-    title: "Commercial Director",
-    company: "Adria Logistics Group",
-    industry: "logistics",
-    goal: "offering",
-    companyType: "enterprise",
-    available: false,
-    goalText:
-      "Offering cross-border fulfillment infrastructure for B2B e-commerce and wholesale operations in CEE.",
-    tags: ["Fulfillment", "Cross-border", "CEE", "Warehousing"],
-  },
-  {
-    id: 3,
-    name: "Sara Kovac",
-    title: "VP Business Development",
-    company: "Raven Capital Tech",
-    industry: "fintech",
-    goal: "seeking",
-    companyType: "scaleup",
-    available: true,
-    goalText:
-      "Seeking payment and compliance partners to accelerate onboarding for medium-sized B2B merchants.",
-    tags: ["Payments", "Compliance", "Risk", "API Integrations"],
-  },
-  {
-    id: 4,
-    name: "Luka Petrovski",
-    title: "Founder & CEO",
-    company: "Helix Advisory",
-    industry: "consulting",
-    goal: "offering",
-    companyType: "agency",
-    available: true,
-    goalText:
-      "Offering GTM consulting for industrial companies entering new European channels and verticals.",
-    tags: ["Go-to-Market", "B2B Sales", "Industrial", "Market Entry"],
-  },
-  {
-    id: 5,
-    name: "Ana Markovic",
-    title: "International Sales Lead",
-    company: "Orion Components",
-    industry: "manufacturing",
-    goal: "seeking",
-    companyType: "distributor",
-    available: false,
-    goalText:
-      "Seeking OEM and distribution alliances for advanced machine components in automotive supply chains.",
-    tags: ["OEM", "Automotive", "Supply Chain", "Distribution"],
-  },
 ];
 
 export function MatchmakingPage() {
   const [search, setSearch] = useState("");
   const [showAvailableOnly, setShowAvailableOnly] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState(null);
+  const [isRequestMeetingOpen, setIsRequestMeetingOpen] = useState(false);
   const [filters, setFilters] = useState({
     industry: "all",
     goal: "all",
     companyType: "all",
   });
+  const { data, isLoading, isError, error } = useProfiles({
+    limit: 50,
+    accepting_meetings: showAvailableOnly ? true : undefined,
+  });
+
+  const matches = useMemo(() => {
+    return (data?.items ?? []).map(profileToMatch);
+  }, [data?.items]);
 
   const filteredMatches = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return MATCHES.filter((item) => {
+    return matches.filter((item) => {
       const matchesSearch =
         !query ||
         item.name.toLowerCase().includes(query) ||
@@ -130,13 +66,18 @@ export function MatchmakingPage() {
         matchesAvailability
       );
     });
-  }, [search, filters, showAvailableOnly]);
+  }, [matches, search, filters, showAvailableOnly]);
 
   function handleFilterChange(key, value) {
     setFilters((prev) => ({
       ...prev,
       [key]: value,
     }));
+  }
+
+  function handleRequestMeeting(match) {
+    setSelectedMatch(match);
+    setIsRequestMeetingOpen(true);
   }
 
   return (
@@ -164,7 +105,36 @@ export function MatchmakingPage() {
         companyTypes={COMPANY_TYPES}
       />
 
-      <MatchmakingList matches={filteredMatches} />
+      {isLoading ? (
+        <div className="rounded-[1.25rem] border border-input/80 bg-card/95 px-5 py-10 text-center shadow-sm">
+          <h3 className="text-lg font-semibold tracking-[-0.02em] text-foreground">
+            Loading matches
+          </h3>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Finding available profiles for matchmaking.
+          </p>
+        </div>
+      ) : isError ? (
+        <div className="rounded-[1.25rem] border border-destructive/30 bg-card/95 px-5 py-10 text-center shadow-sm">
+          <h3 className="text-lg font-semibold tracking-[-0.02em] text-foreground">
+            Matches could not be loaded
+          </h3>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {error?.message ?? "Please try again in a moment."}
+          </p>
+        </div>
+      ) : (
+        <MatchmakingList
+          matches={filteredMatches}
+          onRequestMeeting={handleRequestMeeting}
+        />
+      )}
+
+      <RequestMeetingModal
+        match={selectedMatch}
+        open={isRequestMeetingOpen}
+        onOpenChange={setIsRequestMeetingOpen}
+      />
     </div>
   );
 }

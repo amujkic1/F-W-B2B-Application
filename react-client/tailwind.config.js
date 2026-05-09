@@ -37,8 +37,8 @@ export default {
         '1': '0px 1px 3px 0px rgba(166, 175, 195, 0.4)',
         '2': '0px 5px 12px 0px rgba(0, 0, 0, 0.1)',
         testimonial: '0px 10px 20px 0px rgba(92, 115, 160, 0.07)',
-        accent: '0px 10px 30px hsl(var(--accent) / 0.22)',
-        'accent-lg': '0px 18px 40px hsl(var(--accent) / 0.28)',
+        accent: '0px 3px 8px hsl(var(--accent) / 0.06)',
+        'accent-lg': '0px 4px 10px hsl(var(--accent) / 0.08)',
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
@@ -49,4 +49,3 @@ export default {
   },
   plugins: [],
 }
-

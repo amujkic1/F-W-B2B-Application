@@ -1,5 +1,4 @@
 import Cookies from 'js-cookie';
-import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query'
 import { registerUser } from '@/api/auth.js'
 import { loginUser } from '../api/auth'
