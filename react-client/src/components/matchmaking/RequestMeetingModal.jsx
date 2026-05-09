@@ -1,5 +1,6 @@
 import {
-  CalendarClock,
+  CalendarIcon,
+  Clock,
   Link,
   MapPin,
   Monitor,
@@ -9,6 +10,7 @@ import { useMemo, useState } from "react"
 
 import { Badge } from "@/components/ui/badge.jsx"
 import { Button } from "@/components/ui/button.jsx"
+import { Calendar } from "@/components/ui/calendar.jsx"
 import {
   Dialog,
   DialogContent,
@@ -18,6 +20,11 @@ import {
 } from "@/components/ui/dialog.jsx"
 import { Input } from "@/components/ui/input.jsx"
 import { Label } from "@/components/ui/label.jsx"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover.jsx"
 import {
   Select,
   SelectContent,
@@ -62,8 +69,120 @@ function toIsoDateTime(value) {
   return new Date(value).toISOString()
 }
 
+function parseLocalDateTime(value) {
+  if (!value) return null
+
+  const [datePart, timePart = "00:00"] = value.split("T")
+  const [year, month, day] = datePart.split("-").map(Number)
+  const [hours, minutes] = timePart.split(":").map(Number)
+
+  if ([year, month, day, hours, minutes].some(Number.isNaN)) {
+    return null
+  }
+
+  return new Date(year, month - 1, day, hours, minutes)
+}
+
+function formatDateTimeDisplay(value) {
+  const date = parseLocalDateTime(value)
+
+  if (!date) return "Pick a date and time"
+
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date)
+}
+
+function getDatePart(value) {
+  return value ? value.split("T")[0] : ""
+}
+
+function getTimePart(value, fallbackTime) {
+  return value?.split("T")[1]?.slice(0, 5) ?? fallbackTime
+}
+
+function formatDatePart(date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+
+  return `${year}-${month}-${day}`
+}
+
+function composeDateTime(datePart, timePart) {
+  if (!datePart) return ""
+  return `${datePart}T${timePart || "00:00"}`
+}
+
 function getRecipientUserId(match) {
   return match?.recipient_user_id ?? match?.recipientUserId ?? match?.user_id ?? match?.userId ?? match?.id
+}
+
+function DateTimePicker({
+  id,
+  value,
+  onChange,
+  disabled,
+  defaultTime = "09:00",
+}) {
+  const selectedDate = parseLocalDateTime(value)
+  const timeValue = getTimePart(value, defaultTime)
+
+  function handleDateSelect(date) {
+    onChange(composeDateTime(formatDatePart(date), timeValue))
+  }
+
+  function handleTimeChange(nextTime) {
+    const datePart = getDatePart(value) || formatDatePart(new Date())
+    onChange(composeDateTime(datePart, nextTime))
+  }
+
+  return (
+    <div className="grid gap-2">
+      <Popover>
+        <PopoverTrigger
+          id={id}
+          type="button"
+          disabled={disabled}
+          className="inline-flex h-12 w-full items-center justify-start gap-3 rounded-xl border border-input/80 bg-background/90 px-4 py-2 text-left text-sm font-medium text-foreground shadow-sm transition-all duration-200 outline-none hover:bg-muted/60 focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-accent/15 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <CalendarIcon className="size-4 text-muted-foreground" />
+          <span className={value ? "" : "text-muted-foreground/70"}>
+            {formatDateTimeDisplay(value)}
+          </span>
+        </PopoverTrigger>
+        <PopoverContent align="start" className="p-0">
+          <Calendar
+            selected={selectedDate}
+            onSelect={handleDateSelect}
+            disabled={disabled}
+            initialFocus
+          />
+          <div className="border-t border-border/80 p-3">
+            <Label
+              htmlFor={`${id}-time`}
+              className="mb-2 flex items-center gap-2 text-xs font-medium text-muted-foreground"
+            >
+              <Clock className="size-3.5" />
+              Time
+            </Label>
+            <Input
+              id={`${id}-time`}
+              type="time"
+              value={timeValue}
+              onChange={(event) => handleTimeChange(event.target.value)}
+              disabled={disabled}
+              className="h-10"
+            />
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  )
 }
 
 export function RequestMeetingModal({ match, open, onOpenChange }) {
@@ -252,35 +371,23 @@ export function RequestMeetingModal({ match, open, onOpenChange }) {
 
             <div className="grid gap-4 md:grid-cols-2">
               <Field id="requested-start-at" label="Requested start">
-                <div className="relative">
-                  <CalendarClock className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="requested-start-at"
-                    name="requested_start_at"
-                    type="datetime-local"
-                    className="pl-10"
-                    value={formState.requested_start_at}
-                    onChange={(event) => updateField("requested_start_at", event.target.value)}
-                    disabled={isPending}
-                    required
-                  />
-                </div>
+                <DateTimePicker
+                  id="requested-start-at"
+                  value={formState.requested_start_at}
+                  onChange={(value) => updateField("requested_start_at", value)}
+                  disabled={isPending}
+                  defaultTime="09:00"
+                />
               </Field>
 
               <Field id="requested-end-at" label="Requested end">
-                <div className="relative">
-                  <CalendarClock className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="requested-end-at"
-                    name="requested_end_at"
-                    type="datetime-local"
-                    className="pl-10"
-                    value={formState.requested_end_at}
-                    onChange={(event) => updateField("requested_end_at", event.target.value)}
-                    disabled={isPending}
-                    required
-                  />
-                </div>
+                <DateTimePicker
+                  id="requested-end-at"
+                  value={formState.requested_end_at}
+                  onChange={(value) => updateField("requested_end_at", value)}
+                  disabled={isPending}
+                  defaultTime="10:00"
+                />
               </Field>
             </div>
 
