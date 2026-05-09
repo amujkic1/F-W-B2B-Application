@@ -16,9 +16,7 @@ export const Layout = ({ children }) => {
 
   return (
     <div className="app-shell">
-      <div className="pointer-events-none absolute inset-0 dot-grid opacity-[0.03] dark:dot-grid-inverted dark:opacity-[0.04]" />
-      <div className="pointer-events-none absolute -left-20 top-24 h-72 w-72 rounded-full bg-primary/10 blur-[140px]" />
-      <div className="pointer-events-none absolute right-0 top-1/3 h-96 w-96 rounded-full bg-accent-secondary/10 blur-[160px]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-gradient-to-b from-accent/5 to-transparent" />
       <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
       <Header onMenuToggle={toggleSidebar} />
 

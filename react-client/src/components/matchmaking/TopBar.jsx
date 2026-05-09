@@ -22,7 +22,7 @@ export function TopBar({
   companyTypes,
 }) {
   return (
-    <section className="sticky top-4 z-30 mb-6 rounded-[1.25rem] border border-input/80 bg-card/95 p-4 shadow-sm backdrop-blur-md">
+    <section className="sticky top-4 z-30 mb-6 rounded-[1.25rem] border border-input/80 bg-card p-4 shadow-sm">
       <div className="grid gap-3 lg:grid-cols-[1.2fr_1fr_1fr_1fr_auto] lg:items-center">
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

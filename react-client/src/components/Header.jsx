@@ -5,7 +5,7 @@ export const Header = ({ onMenuToggle }) => {
   const { isDark, toggleTheme } = useTheme()
 
   return (
-    <header className="sticky top-0 z-50 flex h-20 items-center gap-4 border-b border-border/60 bg-background/75 px-4 backdrop-blur-xl md:pl-72 md:px-8">
+    <header className="sticky top-0 z-50 flex h-20 items-center gap-4 border-b border-border/60 bg-background/95 px-4 shadow-sm md:pl-72 md:px-8">
       <div className="flex flex-1 items-center gap-3">
         <button
           onClick={onMenuToggle}

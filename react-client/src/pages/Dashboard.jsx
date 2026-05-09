@@ -81,7 +81,7 @@ export const Dashboard = () => {
       <section className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
         <div className="space-y-6">
           <div className="section-pill w-fit">
-            <span className="section-pill-dot animate-pulse-dot" />
+            <span className="section-pill-dot" />
             <span className="section-label text-accent">Operations dashboard</span>
           </div>
 
@@ -114,7 +114,7 @@ export const Dashboard = () => {
         </div>
 
         <div className="hidden lg:block">
-          <div className="gradient-border animate-reveal">
+          <div className="gradient-border">
             <div className="relative overflow-hidden rounded-[calc(1.75rem-1px)] bg-card p-6">
               <div className="absolute inset-0 dot-grid opacity-[0.06]" />
               <div className="relative min-h-[360px] rounded-[1.5rem] border border-border/70 bg-background/80 p-6">
@@ -131,7 +131,7 @@ export const Dashboard = () => {
                 </div>
 
                 <div className="mt-8 flex items-center justify-center">
-                  <div className="relative h-52 w-52 rounded-full border border-border/60 animate-spin-slow">
+                  <div className="relative h-52 w-52 rounded-full border border-border/60">
                     <div className="absolute left-1/2 top-2 h-3 w-3 -translate-x-1/2 rounded-full bg-accent" />
                     <div className="absolute bottom-2 left-1/2 h-3 w-3 -translate-x-1/2 rounded-full bg-accent-secondary" />
                     <div className="absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-primary" />
@@ -139,12 +139,12 @@ export const Dashboard = () => {
                   </div>
                 </div>
 
-                <div className="absolute left-8 top-36 w-40 rounded-2xl border border-border/70 bg-card/95 p-4 shadow-[0_16px_40px_rgba(15,23,42,0.08)] animate-float">
+                <div className="absolute left-8 top-36 w-40 rounded-2xl border border-border/70 bg-card/95 p-4 shadow-sm">
                   <p className="section-label text-muted-foreground">Trend</p>
                   <p className="mt-2 text-lg font-semibold tracking-[-0.03em] text-foreground">+18.2%</p>
                 </div>
 
-                <div className="absolute bottom-8 right-8 w-44 rounded-2xl border border-border/70 bg-card/95 p-4 shadow-[0_16px_40px_rgba(15,23,42,0.08)] animate-float-delayed">
+                <div className="absolute bottom-8 right-8 w-44 rounded-2xl border border-border/70 bg-card/95 p-4 shadow-sm">
                   <p className="section-label text-muted-foreground">Momentum</p>
                   <p className="mt-2 text-lg font-semibold tracking-[-0.03em] text-foreground">847 live meetings</p>
                 </div>
@@ -160,7 +160,7 @@ export const Dashboard = () => {
         <div className="grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-center">
           <div>
             <div className="section-pill w-fit border-white/10 bg-white/5">
-              <span className="section-pill-dot animate-pulse-dot bg-white shadow-[0_0_0_6px_rgba(255,255,255,0.12)]" />
+              <span className="section-pill-dot bg-white shadow-[0_0_0_6px_rgba(255,255,255,0.12)]" />
               <span className="section-label text-white/70">Momentum</span>
             </div>
 
