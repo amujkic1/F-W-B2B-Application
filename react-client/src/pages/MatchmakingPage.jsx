@@ -8,12 +8,6 @@ import { useCompanyTypes } from "@/queries/useCompanyTypes.js";
 import { useIndustries } from "@/queries/useIndustries.js";
 import { useProfiles } from "@/queries/useProfiles.js";
 
-const GOALS = [
-  { value: "all", label: "All Goals" },
-  { value: "offering", label: "Offering" },
-  { value: "seeking", label: "Seeking" },
-];
-
 export function MatchmakingPage() {
   const [search, setSearch] = useState("");
   const [showAvailableOnly, setShowAvailableOnly] = useState(false);
@@ -21,7 +15,6 @@ export function MatchmakingPage() {
   const [isRequestMeetingOpen, setIsRequestMeetingOpen] = useState(false);
   const [filters, setFilters] = useState({
     industry: "all",
-    goal: "all",
     companyType: "all",
   });
 
@@ -76,15 +69,12 @@ export function MatchmakingPage() {
         item.name.toLowerCase().includes(query) ||
         item.title.toLowerCase().includes(query) ||
         item.company.toLowerCase().includes(query) ||
-        item.goalText.toLowerCase().includes(query) ||
-        item.goal.toLowerCase().includes(query) ||
         industryLabel.toLowerCase().includes(query) ||
         companyTypeLabel.toLowerCase().includes(query) ||
         item.tags.some((tag) => tag.toLowerCase().includes(query));
 
       const matchesIndustry =
         filters.industry === "all" || itemIndustry === filters.industry;
-      const matchesGoal = filters.goal === "all" || item.goal === filters.goal;
       const matchesCompanyType =
         filters.companyType === "all" ||
         itemCompanyType === filters.companyType;
@@ -93,7 +83,6 @@ export function MatchmakingPage() {
       return (
         matchesSearch &&
         matchesIndustry &&
-        matchesGoal &&
         matchesCompanyType &&
         matchesAvailability
       );
@@ -133,7 +122,6 @@ export function MatchmakingPage() {
         showAvailableOnly={showAvailableOnly}
         onShowAvailableOnlyChange={setShowAvailableOnly}
         industries={industries}
-        goals={GOALS}
         companyTypes={companyTypes}
       />
 
