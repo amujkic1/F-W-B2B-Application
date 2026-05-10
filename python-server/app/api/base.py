@@ -1,10 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel  
 from app.services.base import BaseService
 from app.schemas.paginated_response import PaginatedResponse 
 from app.db.database import get_db
-from typing import Any
 from uuid import UUID
 
 class BaseRouter[Model, ReadSchema, CreateSchema: BaseModel, UpdateSchema: BaseModel, FilterSchema: BaseModel]:
@@ -27,18 +26,26 @@ class BaseRouter[Model, ReadSchema, CreateSchema: BaseModel, UpdateSchema: BaseM
         self._setup_routes()
 
     def _setup_routes(self):
-        FilterDep = self.filter_schema or BaseModel
+        if self.filter_schema:
+            FilterDep = self.filter_schema
 
-        @self.router.get("/", response_model=PaginatedResponse[self.read_schema])
-        async def read_all(
-            skip: int = 0,
-            limit: int = 10,
-            db: AsyncSession = Depends(get_db),
-            filters: FilterDep = Depends()
-        ):
-            filter_data = filters.model_dump(exclude_none=True) if self.filter_schema else {}
-            
-            return await self.service.get_all(db, skip=skip, limit=limit, **filter_data)
+            @self.router.get("/", response_model=PaginatedResponse[self.read_schema])
+            async def read_all(
+                skip: int = 0,
+                limit: int = 10,
+                db: AsyncSession = Depends(get_db),
+                filters: FilterDep = Depends()
+            ):
+                filter_data = filters.model_dump(exclude_none=True)
+                return await self.service.get_all(db, skip=skip, limit=limit, **filter_data)
+        else:
+            @self.router.get("/", response_model=PaginatedResponse[self.read_schema])
+            async def read_all(
+                skip: int = 0,
+                limit: int = 10,
+                db: AsyncSession = Depends(get_db),
+            ):
+                return await self.service.get_all(db, skip=skip, limit=limit)
 
         @self.router.get("/{id}", response_model=self.read_schema)
         async def read_by_id(id: UUID, db: AsyncSession = Depends(get_db)): # UUID ispravka

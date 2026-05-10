@@ -4,20 +4,14 @@ import { MatchmakingList } from "@/components/matchmaking/MatchmakingList.jsx";
 import { profileToMatch } from "@/components/matchmaking/profileToMatch.js";
 import { RequestMeetingModal } from "@/components/matchmaking/RequestMeetingModal.jsx";
 import { TopBar } from "@/components/matchmaking/TopBar.jsx";
+import { useCompanyTypes } from "@/queries/useCompanyTypes.js";
+import { useIndustries } from "@/queries/useIndustries.js";
 import { useProfiles } from "@/queries/useProfiles.js";
-
-const INDUSTRIES = [
-  { value: "all", label: "All Industries" },
-];
 
 const GOALS = [
   { value: "all", label: "All Goals" },
   { value: "offering", label: "Offering" },
   { value: "seeking", label: "Seeking" },
-];
-
-const COMPANY_TYPES = [
-  { value: "all", label: "All Company Types" },
 ];
 
 export function MatchmakingPage() {
@@ -30,10 +24,31 @@ export function MatchmakingPage() {
     goal: "all",
     companyType: "all",
   });
+
+  const { data: industriesData } = useIndustries({ limit: 100 });
+  const { data: companyTypesData } = useCompanyTypes({ limit: 100 });
   const { data, isLoading, isError, error } = useProfiles({
     limit: 50,
     accepting_meetings: showAvailableOnly ? true : undefined,
   });
+
+  const industries = useMemo(() => {
+    const options = (industriesData?.items ?? []).map((industry) => ({
+      value: industry.id,
+      label: industry.name,
+    }));
+
+    return [{ value: "all", label: "All Industries" }, ...options];
+  }, [industriesData?.items]);
+
+  const companyTypes = useMemo(() => {
+    const options = (companyTypesData?.items ?? []).map((companyType) => ({
+      value: companyType.id,
+      label: companyType.name,
+    }));
+
+    return [{ value: "all", label: "All Company Types" }, ...options];
+  }, [companyTypesData?.items]);
 
   const matches = useMemo(() => {
     return (data?.items ?? []).map(profileToMatch);
@@ -100,9 +115,9 @@ export function MatchmakingPage() {
         onFilterChange={handleFilterChange}
         showAvailableOnly={showAvailableOnly}
         onShowAvailableOnlyChange={setShowAvailableOnly}
-        industries={INDUSTRIES}
+        industries={industries}
         goals={GOALS}
-        companyTypes={COMPANY_TYPES}
+        companyTypes={companyTypes}
       />
 
       {isLoading ? (
