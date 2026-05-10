@@ -1,16 +1,13 @@
 import { MatchCard } from '@/components/matchmaking/MatchCard.jsx'
+import { EmptyState } from '@/components/ui/empty-state.jsx'
 
 export function MatchmakingList({ matches, onRequestMeeting }) {
   if (!matches.length) {
     return (
-      <div className="rounded-[1.25rem] border border-input/80 bg-card/95 px-5 py-10 text-center shadow-sm">
-        <h3 className="text-lg font-semibold tracking-[-0.02em] text-foreground">
-          No matches found
-        </h3>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Try adjusting the smart filters to broaden the result set.
-        </p>
-      </div>
+      <EmptyState
+        title="No matches found"
+        description="Try adjusting the smart filters to broaden the result set."
+      />
     )
   }
 

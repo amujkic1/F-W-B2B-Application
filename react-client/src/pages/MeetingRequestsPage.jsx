@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react"
 
 import { MeetingRequestCard } from "@/components/meeting-requests/MeetingRequestCard.jsx"
+import { EmptyState } from "@/components/ui/empty-state.jsx"
 import {
   useMeetingRequests,
   useUpdateMeetingRequestMutation,
@@ -81,32 +82,23 @@ export function MeetingRequestsPage() {
       </section>
 
       {!user?.id ? (
-        <div className="shell-panel px-5 py-10 text-center">
-          <h3 className="text-lg font-semibold tracking-[-0.02em] text-foreground">
-            User context is missing
-          </h3>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Log in again so incoming meeting requests can be matched to your account.
-          </p>
-        </div>
+        <EmptyState
+          title="User context is missing"
+          description="Log in again so incoming meeting requests can be matched to your account."
+          className="shell-panel"
+        />
       ) : isLoading ? (
-        <div className="shell-panel px-5 py-10 text-center">
-          <h3 className="text-lg font-semibold tracking-[-0.02em] text-foreground">
-            Loading requests
-          </h3>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Pulling in your latest meeting requests.
-          </p>
-        </div>
+        <EmptyState
+          title="Loading requests"
+          description="Pulling in your latest meeting requests."
+          className="shell-panel"
+        />
       ) : isError ? (
-        <div className="rounded-[1.25rem] border border-destructive/30 bg-card/95 px-5 py-10 text-center shadow-sm">
-          <h3 className="text-lg font-semibold tracking-[-0.02em] text-foreground">
-            Requests could not be loaded
-          </h3>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {error?.message ?? "Please try again in a moment."}
-          </p>
-        </div>
+        <EmptyState
+          title="Requests could not be loaded"
+          description={error?.message ?? "Please try again in a moment."}
+          variant="error"
+        />
       ) : meetingRequests.length ? (
         <div className="space-y-4">
           {updateMeetingRequestMutation.isError && (
@@ -126,15 +118,13 @@ export function MeetingRequestsPage() {
           ))}
         </div>
       ) : (
-        <div className="shell-panel px-5 py-10 text-center">
-          <h3 className="text-lg font-semibold tracking-[-0.02em] text-foreground">
-            No requests here
-          </h3>
-          <p className="mt-2 text-sm text-muted-foreground">
-            There are no {statusFilter === "all" ? "" : statusFilter} meeting requests
-            to review right now.
-          </p>
-        </div>
+        <EmptyState
+          title="No requests here"
+          description={`There are no ${
+            statusFilter === "all" ? "" : statusFilter
+          } meeting requests to review right now.`}
+          className="shell-panel"
+        />
       )}
     </div>
   )

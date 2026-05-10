@@ -4,6 +4,7 @@ import { MatchmakingList } from "@/components/matchmaking/MatchmakingList.jsx";
 import { profileToMatch } from "@/components/matchmaking/profileToMatch.js";
 import { RequestMeetingModal } from "@/components/matchmaking/RequestMeetingModal.jsx";
 import { TopBar } from "@/components/matchmaking/TopBar.jsx";
+import { EmptyState } from "@/components/ui/empty-state.jsx";
 import { useCompanyTypes } from "@/queries/useCompanyTypes.js";
 import { useIndustries } from "@/queries/useIndustries.js";
 import { useProfiles } from "@/queries/useProfiles.js";
@@ -126,23 +127,16 @@ export function MatchmakingPage() {
       />
 
       {isLoading ? (
-        <div className="rounded-[1.25rem] border border-input/80 bg-card/95 px-5 py-10 text-center shadow-sm">
-          <h3 className="text-lg font-semibold tracking-[-0.02em] text-foreground">
-            Loading matches
-          </h3>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Finding available profiles for matchmaking.
-          </p>
-        </div>
+        <EmptyState
+          title="Loading matches"
+          description="Finding available profiles for matchmaking."
+        />
       ) : isError ? (
-        <div className="rounded-[1.25rem] border border-destructive/30 bg-card/95 px-5 py-10 text-center shadow-sm">
-          <h3 className="text-lg font-semibold tracking-[-0.02em] text-foreground">
-            Matches could not be loaded
-          </h3>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {error?.message ?? "Please try again in a moment."}
-          </p>
-        </div>
+        <EmptyState
+          title="Matches could not be loaded"
+          description={error?.message ?? "Please try again in a moment."}
+          variant="error"
+        />
       ) : (
         <MatchmakingList
           matches={filteredMatches}
