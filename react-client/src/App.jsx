@@ -5,6 +5,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Dashboard } from "@/pages/Dashboard";
 import { LoginPage } from "@/pages/LoginPage.jsx";
 import { MatchmakingPage } from "@/pages/MatchmakingPage.jsx";
+import { MeetingRequestsPage } from "@/pages/MeetingRequestsPage.jsx";
 import { RegistrationPage } from "@/pages/RegistrationPage.jsx";
 import { HomePage } from "@/pages/HomePage.jsx";
 
@@ -19,6 +20,7 @@ function AppRoutes() {
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/matchmaking" element={<MatchmakingPage />} />
+          <Route path="/meeting-requests" element={<MeetingRequestsPage />} />
         </Route>
       </Route>
 

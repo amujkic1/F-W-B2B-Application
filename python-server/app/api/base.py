@@ -56,17 +56,24 @@ class BaseRouter[Model, ReadSchema, CreateSchema: BaseModel, UpdateSchema: BaseM
 
         @self.router.post("/", response_model=self.read_schema, status_code=201)
         async def create(obj_in: self.create_schema, db: AsyncSession = Depends(get_db)):
-            return await self.service.create(db, obj_in=obj_in)
+            try:
+                return await self.service.create(db, obj_in=obj_in)
+            except ValueError as exc:
+                raise HTTPException(status_code=400, detail=str(exc)) from exc
 
         @self.router.put("/{id}", response_model=self.read_schema)
-        async def update(id: int, obj_in: self.update_schema, db: AsyncSession = Depends(get_db)):
+        @self.router.patch("/{id}", response_model=self.read_schema)
+        async def update(id: UUID, obj_in: self.update_schema, db: AsyncSession = Depends(get_db)):
             item = await self.service.get(db, id=id)
             if not item:
                 raise HTTPException(status_code=404, detail="Resource not found")
-            return await self.service.update(db, db_obj=item, obj_in=obj_in)
+            try:
+                return await self.service.update(db, db_obj=item, obj_in=obj_in)
+            except ValueError as exc:
+                raise HTTPException(status_code=400, detail=str(exc)) from exc
 
         @self.router.delete("/{id}", status_code=204)
-        async def delete(id: int, db: AsyncSession = Depends(get_db)):
+        async def delete(id: UUID, db: AsyncSession = Depends(get_db)):
             success = await self.service.remove(db, id=id)
             if not success:
                 raise HTTPException(status_code=404, detail="Resource not found")

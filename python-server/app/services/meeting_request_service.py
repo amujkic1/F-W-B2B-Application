@@ -1,57 +1,71 @@
-from uuid import UUID
+from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.meeting_request import MeetingRequest
 from app.schemas.meeting_request import MeetingRequestCreate, MeetingRequestUpdate
+from .base import BaseService
 
 
-def _validate_meeting_window(start_at, end_at) -> None:
-    if start_at >= end_at:
-        raise ValueError("requested_start_at must be before requested_end_at")
+class MeetingRequestService(BaseService[MeetingRequest, MeetingRequestCreate, MeetingRequestUpdate]):
+    def _validate_meeting_window(self, start_at, end_at) -> None:
+        if start_at >= end_at:
+            raise ValueError("requested_start_at must be before requested_end_at")
+
+    async def get_all(
+        self,
+        db: AsyncSession,
+        skip: int = 0,
+        limit: int = 100,
+        options: list | None = None,
+        **filters,
+    ) -> dict[str, Any]:
+        query = select(self.model).order_by(self.model.created_at.desc())
+
+        if options:
+            query = query.options(*options)
+
+        active_filters = {
+            key: value
+            for key, value in filters.items()
+            if value is not None and hasattr(self.model, key)
+        }
+
+        if active_filters:
+            query = query.filter_by(**active_filters)
+
+        count_query = select(func.count()).select_from(query.subquery())
+        count_result = await db.execute(count_query)
+        total = count_result.scalar() or 0
+
+        items_result = await db.execute(query.offset(skip).limit(limit))
+
+        return {
+            "items": list(items_result.scalars().all()),
+            "total": total,
+            "skip": skip,
+            "limit": limit,
+        }
+
+    async def create(self, db: AsyncSession, *, obj_in: MeetingRequestCreate) -> MeetingRequest:
+        self._validate_meeting_window(obj_in.requested_start_at, obj_in.requested_end_at)
+        return await super().create(db, obj_in=obj_in)
+
+    async def update(
+        self,
+        db: AsyncSession,
+        *,
+        db_obj: MeetingRequest,
+        obj_in: MeetingRequestUpdate | dict[str, Any],
+    ) -> MeetingRequest:
+        update_data = obj_in if isinstance(obj_in, dict) else obj_in.model_dump(exclude_unset=True)
+
+        start_at = update_data.get("requested_start_at", db_obj.requested_start_at)
+        end_at = update_data.get("requested_end_at", db_obj.requested_end_at)
+        self._validate_meeting_window(start_at, end_at)
+
+        return await super().update(db, db_obj=db_obj, obj_in=update_data)
 
 
-async def create_meeting_request(db: AsyncSession, meeting_request_in: MeetingRequestCreate) -> MeetingRequest:
-    _validate_meeting_window(meeting_request_in.requested_start_at, meeting_request_in.requested_end_at)
-
-    db_meeting_request = MeetingRequest(**meeting_request_in.model_dump())
-    db.add(db_meeting_request)
-    await db.commit()
-    await db.refresh(db_meeting_request)
-    return db_meeting_request
-
-
-async def get_meeting_request_by_id(db: AsyncSession, meeting_request_id: UUID) -> MeetingRequest | None:
-    result = await db.execute(select(MeetingRequest).where(MeetingRequest.id == meeting_request_id))
-    return result.scalars().first()
-
-
-async def list_meeting_requests(db: AsyncSession, skip: int = 0, limit: int = 100) -> list[MeetingRequest]:
-    result = await db.execute(select(MeetingRequest).offset(skip).limit(limit))
-    return list(result.scalars().all())
-
-
-async def update_meeting_request(
-    db: AsyncSession,
-    db_meeting_request: MeetingRequest,
-    meeting_request_in: MeetingRequestUpdate,
-) -> MeetingRequest:
-    update_data = meeting_request_in.model_dump(exclude_unset=True)
-
-    start_at = update_data.get("requested_start_at", db_meeting_request.requested_start_at)
-    end_at = update_data.get("requested_end_at", db_meeting_request.requested_end_at)
-    _validate_meeting_window(start_at, end_at)
-
-    for field, value in update_data.items():
-        setattr(db_meeting_request, field, value)
-
-    db.add(db_meeting_request)
-    await db.commit()
-    await db.refresh(db_meeting_request)
-    return db_meeting_request
-
-
-async def delete_meeting_request(db: AsyncSession, db_meeting_request: MeetingRequest) -> None:
-    await db.delete(db_meeting_request)
-    await db.commit()
+meeting_request_service = MeetingRequestService(MeetingRequest)
