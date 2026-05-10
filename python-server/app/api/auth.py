@@ -144,14 +144,14 @@ async def refresh(
     )
     result = await db.execute(query)
     db_token = result.scalars().first()
-    
-    if not db_token or db_token.expires_at < datetime.now(timezone.utc):
+
+    if not db_token or db_token.expires_at.replace(tzinfo=None) < datetime.utcnow():
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Refresh token has expired or been revoked"
         )
     
-    result = await db.execute(select(User).where(User.id == user_id))
+    result = await db.execute(select(User).options(joinedload(User.profile)).where(User.id == user_id))
     user = result.scalars().first()
     
     if not user or user.status != "active":
@@ -168,7 +168,8 @@ async def refresh(
     return Token(
         access_token=new_access_token, 
         refresh_token=refresh_token, 
-        token_type="bearer"
+        token_type="bearer",
+        user=user
     )
 
 @router.post("/logout")

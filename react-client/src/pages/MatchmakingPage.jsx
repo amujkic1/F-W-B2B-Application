@@ -4,21 +4,10 @@ import { MatchmakingList } from "@/components/matchmaking/MatchmakingList.jsx";
 import { profileToMatch } from "@/components/matchmaking/profileToMatch.js";
 import { RequestMeetingModal } from "@/components/matchmaking/RequestMeetingModal.jsx";
 import { TopBar } from "@/components/matchmaking/TopBar.jsx";
+import { EmptyState } from "@/components/ui/empty-state.jsx";
+import { useCompanyTypes } from "@/queries/useCompanyTypes.js";
+import { useIndustries } from "@/queries/useIndustries.js";
 import { useProfiles } from "@/queries/useProfiles.js";
-
-const INDUSTRIES = [
-  { value: "all", label: "All Industries" },
-];
-
-const GOALS = [
-  { value: "all", label: "All Goals" },
-  { value: "offering", label: "Offering" },
-  { value: "seeking", label: "Seeking" },
-];
-
-const COMPANY_TYPES = [
-  { value: "all", label: "All Company Types" },
-];
 
 export function MatchmakingPage() {
   const [search, setSearch] = useState("");
@@ -27,13 +16,41 @@ export function MatchmakingPage() {
   const [isRequestMeetingOpen, setIsRequestMeetingOpen] = useState(false);
   const [filters, setFilters] = useState({
     industry: "all",
-    goal: "all",
     companyType: "all",
   });
+
+  const { data: industriesData } = useIndustries({ limit: 100 });
+  const { data: companyTypesData } = useCompanyTypes({ limit: 100 });
   const { data, isLoading, isError, error } = useProfiles({
     limit: 50,
     accepting_meetings: showAvailableOnly ? true : undefined,
   });
+
+  const industries = useMemo(() => {
+    const options = (industriesData?.items ?? []).map((industry) => ({
+      value: industry.id,
+      label: industry.name,
+    }));
+
+    return [{ value: "all", label: "All Industries" }, ...options];
+  }, [industriesData?.items]);
+
+  const companyTypes = useMemo(() => {
+    const options = (companyTypesData?.items ?? []).map((companyType) => ({
+      value: companyType.id,
+      label: companyType.name,
+    }));
+
+    return [{ value: "all", label: "All Company Types" }, ...options];
+  }, [companyTypesData?.items]);
+
+  const industryLabels = useMemo(() => {
+    return new Map(industries.map((industry) => [industry.value, industry.label]));
+  }, [industries]);
+
+  const companyTypeLabels = useMemo(() => {
+    return new Map(companyTypes.map((companyType) => [companyType.value, companyType.label]));
+  }, [companyTypes]);
 
   const matches = useMemo(() => {
     return (data?.items ?? []).map(profileToMatch);
@@ -43,30 +60,35 @@ export function MatchmakingPage() {
     const query = search.trim().toLowerCase();
 
     return matches.filter((item) => {
+      const itemIndustry = String(item.industry ?? "all");
+      const itemCompanyType = String(item.companyType ?? "all");
+      const industryLabel = industryLabels.get(itemIndustry) ?? "";
+      const companyTypeLabel = companyTypeLabels.get(itemCompanyType) ?? "";
+
       const matchesSearch =
         !query ||
         item.name.toLowerCase().includes(query) ||
+        item.title.toLowerCase().includes(query) ||
         item.company.toLowerCase().includes(query) ||
-        item.goalText.toLowerCase().includes(query) ||
+        industryLabel.toLowerCase().includes(query) ||
+        companyTypeLabel.toLowerCase().includes(query) ||
         item.tags.some((tag) => tag.toLowerCase().includes(query));
 
       const matchesIndustry =
-        filters.industry === "all" || item.industry === filters.industry;
-      const matchesGoal = filters.goal === "all" || item.goal === filters.goal;
+        filters.industry === "all" || itemIndustry === filters.industry;
       const matchesCompanyType =
         filters.companyType === "all" ||
-        item.companyType === filters.companyType;
+        itemCompanyType === filters.companyType;
       const matchesAvailability = !showAvailableOnly || item.available;
 
       return (
         matchesSearch &&
         matchesIndustry &&
-        matchesGoal &&
         matchesCompanyType &&
         matchesAvailability
       );
     });
-  }, [matches, search, filters, showAvailableOnly]);
+  }, [matches, search, filters, showAvailableOnly, industryLabels, companyTypeLabels]);
 
   function handleFilterChange(key, value) {
     setFilters((prev) => ({
@@ -100,29 +122,21 @@ export function MatchmakingPage() {
         onFilterChange={handleFilterChange}
         showAvailableOnly={showAvailableOnly}
         onShowAvailableOnlyChange={setShowAvailableOnly}
-        industries={INDUSTRIES}
-        goals={GOALS}
-        companyTypes={COMPANY_TYPES}
+        industries={industries}
+        companyTypes={companyTypes}
       />
 
       {isLoading ? (
-        <div className="rounded-[1.25rem] border border-input/80 bg-card/95 px-5 py-10 text-center shadow-sm">
-          <h3 className="text-lg font-semibold tracking-[-0.02em] text-foreground">
-            Loading matches
-          </h3>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Finding available profiles for matchmaking.
-          </p>
-        </div>
+        <EmptyState
+          title="Loading matches"
+          description="Finding available profiles for matchmaking."
+        />
       ) : isError ? (
-        <div className="rounded-[1.25rem] border border-destructive/30 bg-card/95 px-5 py-10 text-center shadow-sm">
-          <h3 className="text-lg font-semibold tracking-[-0.02em] text-foreground">
-            Matches could not be loaded
-          </h3>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {error?.message ?? "Please try again in a moment."}
-          </p>
-        </div>
+        <EmptyState
+          title="Matches could not be loaded"
+          description={error?.message ?? "Please try again in a moment."}
+          variant="error"
+        />
       ) : (
         <MatchmakingList
           matches={filteredMatches}

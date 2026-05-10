@@ -7,7 +7,7 @@ class BaseService[Model, CreateSchema: BaseModel, UpdateSchema: BaseModel]:
     def __init__(self, model: type[Model]):
         self.model = model
 
-    async def get(self, db: AsyncSession, id: int) -> Model | None:
+    async def get(self, db: AsyncSession, id: Any) -> Model | None:
         result = await db.execute(select(self.model).where(self.model.id == id))
         return result.scalars().first()
 
@@ -60,7 +60,7 @@ class BaseService[Model, CreateSchema: BaseModel, UpdateSchema: BaseModel]:
         await db.refresh(db_obj)
         return db_obj
 
-    async def remove(self, db: AsyncSession, *, id: int) -> Model | None:
+    async def remove(self, db: AsyncSession, *, id: Any) -> Model | None:
         result = await db.execute(select(self.model).where(self.model.id == id))
         obj = result.scalars().first()
         

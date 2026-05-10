@@ -38,6 +38,12 @@ class MeetingRequestUpdate(BaseModel):
     note_from_recipient: str | None = None
 
 
+class MeetingRequestFilter(BaseModel):
+    requester_user_id: UUID | None = None
+    recipient_user_id: UUID | None = None
+    status: Literal['pending', 'accepted', 'rejected', 'cancelled', 'completed'] | None = None
+
+
 class MeetingRequestRead(MeetingRequestBase):
     id: UUID
     created_at: datetime
