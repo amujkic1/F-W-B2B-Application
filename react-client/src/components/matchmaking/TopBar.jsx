@@ -18,6 +18,7 @@ export function TopBar({
   showAvailableOnly,
   onShowAvailableOnlyChange,
   industries,
+  goals,
   companyTypes,
 }) {
   return (
@@ -44,6 +45,22 @@ export function TopBar({
             {industries.map((industry) => (
               <SelectItem key={industry.value} value={industry.value}>
                 {industry.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={filters.goal}
+          onValueChange={(next) => onFilterChange('goal', next)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Goal" />
+          </SelectTrigger>
+          <SelectContent>
+            {goals.map((goal) => (
+              <SelectItem key={goal.value} value={goal.value}>
+                {goal.label}
               </SelectItem>
             ))}
           </SelectContent>
