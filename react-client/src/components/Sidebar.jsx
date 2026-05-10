@@ -11,11 +11,6 @@ export const Sidebar = ({ isOpen, onClose }) => {
       icon: LayoutDashboard,
     },
     {
-      label: 'Partners',
-      href: '/partners',
-      icon: Users,
-    },
-    {
       label: 'Matchmaking',
       href: '/matchmaking',
       icon: Handshake,
@@ -24,11 +19,6 @@ export const Sidebar = ({ isOpen, onClose }) => {
       label: 'Requests',
       href: '/meeting-requests',
       icon: CalendarCheck,
-    },
-    {
-      label: 'Settings',
-      href: '/settings',
-      icon: Settings,
     },
   ]
 
