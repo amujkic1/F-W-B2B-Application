@@ -6,11 +6,6 @@ export const Sidebar = ({ isOpen, onClose }) => {
 
   const navItems = [
     {
-      label: 'Dashboard',
-      href: '/dashboard',
-      icon: LayoutDashboard,
-    },
-    {
       label: 'Matchmaking',
       href: '/matchmaking',
       icon: Handshake,

@@ -44,3 +44,9 @@ class Company(Base):
 
     profile: Mapped["Profile"] = relationship("Profile", back_populates="company")
     company_type: Mapped["CompanyType | None"] = relationship("CompanyType", back_populates="companies")
+    users: Mapped[list["User"]] = relationship("User", back_populates="company")
+    invitations: Mapped[list["CompanyInvitation"]] = relationship(
+        "CompanyInvitation",
+        back_populates="company",
+        cascade="all, delete-orphan",
+    )

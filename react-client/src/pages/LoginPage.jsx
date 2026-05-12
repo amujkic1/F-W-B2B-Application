@@ -20,7 +20,7 @@ export function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const fromPath = location.state?.from?.pathname || "/dashboard";
+  const fromPath = location.state?.from?.pathname || "/matchmaking";
   const fromSearch = location.state?.from?.search || "";
   const fromHash = location.state?.from?.hash || "";
 
@@ -60,9 +60,9 @@ export function LoginPage() {
             <span className="section-label text-accent">Secure access</span>
           </div>
           <div className="space-y-2">
-            <CardTitle className="text-3xl md:text-4xl">Prijava</CardTitle>
+            <CardTitle className="text-3xl md:text-4xl">Sign In</CardTitle>
             <CardDescription>
-              Prijavi se na svoj B2B račun da nastaviš.
+              Sign in to your B2B account to continue.
             </CardDescription>
           </div>
         </CardHeader>
@@ -74,7 +74,7 @@ export function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="ime@firma.com"
+                placeholder="name@company.com"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -106,11 +106,11 @@ export function LoginPage() {
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
               />
-              Zapamti me
+              Remember me
             </label>
 
             <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? "Prijava u toku..." : "Prijavi se"}
+              {isPending ? "Signing in..." : "Sign in"}
             </Button>
           </form>
         </CardContent>
@@ -123,7 +123,7 @@ export function LoginPage() {
           )}
           
           <p className="text-sm text-muted-foreground">
-            Nemaš račun?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               to="/register"
               className={buttonVariants({
@@ -131,7 +131,7 @@ export function LoginPage() {
                 className: "h-auto p-0",
               })}
             >
-              Registruj se
+              Register
             </Link>
           </p>
         </CardFooter>

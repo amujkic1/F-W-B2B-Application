@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel  
@@ -16,6 +18,7 @@ class BaseRouter[Model, ReadSchema, CreateSchema: BaseModel, UpdateSchema: BaseM
         prefix: str,
         tags: list[str],
         filter_schema: type[FilterSchema] | None = None,
+        write_dependency: Callable | None = None,
     ):
         self.router = APIRouter(prefix=prefix, tags=tags)
         self.service = service
@@ -23,6 +26,7 @@ class BaseRouter[Model, ReadSchema, CreateSchema: BaseModel, UpdateSchema: BaseM
         self.create_schema = create_schema
         self.update_schema = update_schema
         self.filter_schema = filter_schema
+        self.write_dependencies = [Depends(write_dependency)] if write_dependency else []
         self._setup_routes()
 
     def _setup_routes(self):
@@ -54,15 +58,28 @@ class BaseRouter[Model, ReadSchema, CreateSchema: BaseModel, UpdateSchema: BaseM
                 raise HTTPException(status_code=404, detail="Resource not found")
             return item
 
-        @self.router.post("/", response_model=self.read_schema, status_code=201)
+        @self.router.post(
+            "/",
+            response_model=self.read_schema,
+            status_code=201,
+            dependencies=self.write_dependencies,
+        )
         async def create(obj_in: self.create_schema, db: AsyncSession = Depends(get_db)):
             try:
                 return await self.service.create(db, obj_in=obj_in)
             except ValueError as exc:
                 raise HTTPException(status_code=400, detail=str(exc)) from exc
 
-        @self.router.put("/{id}", response_model=self.read_schema)
-        @self.router.patch("/{id}", response_model=self.read_schema)
+        @self.router.put(
+            "/{id}",
+            response_model=self.read_schema,
+            dependencies=self.write_dependencies,
+        )
+        @self.router.patch(
+            "/{id}",
+            response_model=self.read_schema,
+            dependencies=self.write_dependencies,
+        )
         async def update(id: UUID, obj_in: self.update_schema, db: AsyncSession = Depends(get_db)):
             item = await self.service.get(db, id=id)
             if not item:
@@ -72,7 +89,11 @@ class BaseRouter[Model, ReadSchema, CreateSchema: BaseModel, UpdateSchema: BaseM
             except ValueError as exc:
                 raise HTTPException(status_code=400, detail=str(exc)) from exc
 
-        @self.router.delete("/{id}", status_code=204)
+        @self.router.delete(
+            "/{id}",
+            status_code=204,
+            dependencies=self.write_dependencies,
+        )
         async def delete(id: UUID, db: AsyncSession = Depends(get_db)):
             success = await self.service.remove(db, id=id)
             if not success:

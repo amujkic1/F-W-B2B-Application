@@ -23,8 +23,17 @@ function clearAuthSession() {
   Cookies.remove('refresh_token', { path: '/' })
 }
 
+const PUBLIC_PATHS = new Set(['/login', '/register', '/register/invitation', '/'])
+
+function isPublicPath(pathname) {
+  return PUBLIC_PATHS.has(pathname) || pathname.startsWith('/register/invitation/')
+}
+
 function redirectToLogin() {
-  if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+  if (
+    typeof window !== 'undefined' &&
+    !isPublicPath(window.location.pathname)
+  ) {
     window.location.replace('/login')
   }
 }
