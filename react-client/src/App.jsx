@@ -6,6 +6,7 @@ import { LoginPage } from "@/pages/LoginPage.jsx";
 import { MatchmakingPage } from "@/pages/MatchmakingPage.jsx";
 import { MeetingRequestsPage } from "@/pages/MeetingRequestsPage.jsx";
 import { RegistrationPage } from "@/pages/RegistrationPage.jsx";
+import { InvitationRegistrationPage } from "@/pages/InvitationRegistrationPage.jsx";
 import { HomePage } from "@/pages/HomePage.jsx";
 
 function AppRoutes() {
@@ -13,6 +14,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegistrationPage />} />
+      <Route path="/register/invitation/:token" element={<InvitationRegistrationPage />} />
       <Route path="/" element={<HomePage />} />
 
       <Route element={<ProtectedRoute />}>

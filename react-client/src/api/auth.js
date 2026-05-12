@@ -20,6 +20,26 @@ export async function registerUser(registration) {
   }
 }
 
+export async function registerWithInvitation(registration) {
+  try {
+    const response = await authClient.post('/api/auth/register/invitation', registration)
+    return response.data
+  } catch (error) {
+    if (error.response) {
+      throw {
+        status: error.response.status,
+        message: error.response.data?.detail || error.response.data?.message || 'Invitation registration was not successful',
+        data: error.response.data,
+      }
+    }
+    throw {
+      status: 0,
+      message: error.message || 'Could not connect to the server',
+      data: null,
+    }
+  }
+}
+
 export async function loginUser({ email, password }) {
   try {
     // 1. Prepare data in URL-encoded format (OAuth2 standard)

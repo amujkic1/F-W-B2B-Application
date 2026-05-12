@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import { useMutation } from '@tanstack/react-query'
-import { registerUser } from '@/api/auth.js'
+import { registerUser, registerWithInvitation } from '@/api/auth.js'
 import { loginUser } from '../api/auth'
 import { useAppStore } from '../store/useAppStore';
 
@@ -23,6 +23,18 @@ export function useRegisterMutation() {
     },
     onError: (error) => {
       console.error('Registration error:', error.message)
+    },
+  })
+}
+
+export function useInvitationRegisterMutation() {
+  return useMutation({
+    mutationFn: registerWithInvitation,
+    onSuccess: (data) => {
+      console.log('Invitation registration successful:', data)
+    },
+    onError: (error) => {
+      console.error('Invitation registration error:', error.message)
     },
   })
 }
