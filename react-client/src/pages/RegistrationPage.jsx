@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-import { useRegisterMutation } from "@/queries/useAuth.js";
+import { useLoginMutation, useRegisterMutation } from "@/queries/useAuth.js";
 import { useCompanyTypes } from "@/queries/useCompanyTypes.js";
 import { useIndustries } from "@/queries/useIndustries.js";
 import { Button, buttonVariants } from "@/components/ui/button.jsx";
@@ -59,6 +59,7 @@ function getItems(data) {
 }
 
 export function RegistrationPage() {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [companyName, setCompanyName] = useState("");
   const [fullName, setFullName] = useState("");
@@ -74,12 +75,20 @@ export function RegistrationPage() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const registerMutation = useRegisterMutation();
+  const loginMutation = useLoginMutation();
   const industriesQuery = useIndustries({ limit: 100 });
   const companyTypesQuery = useCompanyTypes({ limit: 100 });
-  const isPending = registerMutation.isPending;
+  const isPending = registerMutation.isPending || loginMutation.isPending;
   const industries = getItems(industriesQuery.data);
   const companyTypes = getItems(companyTypesQuery.data);
   const isLastStep = currentStep === REGISTRATION_STEPS.length - 1;
+  const submitLabel = loginMutation.isPending
+    ? "Signing in..."
+    : registerMutation.isPending
+      ? "Creating..."
+      : isLastStep
+        ? "Create account"
+        : "Continue";
   const activeStep = REGISTRATION_STEPS[currentStep];
 
   function clearFeedback() {
@@ -165,11 +174,13 @@ export function RegistrationPage() {
     }
 
     const { firstName, lastName } = splitFullName(fullName);
+    const submittedEmail = email.trim();
+    const submittedPassword = password;
 
     registerMutation.mutate(
       {
-        email,
-        password,
+        email: submittedEmail,
+        password: submittedPassword,
         profile: {
           first_name: firstName,
           last_name: lastName,
@@ -184,18 +195,32 @@ export function RegistrationPage() {
       },
       {
         onSuccess: () => {
-          setMessage("Registration successful. You can sign in now.");
-          setCompanyName("");
-          setFullName("");
-          setPosition("");
-          setCompanySize("");
-          setIndustryId("");
-          setCompanyTypeId("");
-          setEmail("");
-          setPassword("");
-          setConfirmPassword("");
-          setTermsAccepted(false);
-          setCurrentStep(0);
+          setMessage("Registration successful. Signing you in...");
+          loginMutation.mutate(
+            { email: submittedEmail, password: submittedPassword },
+            {
+              onSuccess: () => {
+                setCompanyName("");
+                setFullName("");
+                setPosition("");
+                setCompanySize("");
+                setIndustryId("");
+                setCompanyTypeId("");
+                setEmail("");
+                setPassword("");
+                setConfirmPassword("");
+                setTermsAccepted(false);
+                setCurrentStep(0);
+                navigate("/matchmaking", { replace: true });
+              },
+              onError: (error) => {
+                setErrorMessage(
+                  error.message ||
+                    "Registration was successful, but automatic sign-in failed.",
+                );
+              },
+            },
+          );
         },
         onError: (error) => {
           setErrorMessage(error.message);
@@ -418,7 +443,7 @@ export function RegistrationPage() {
                 Back
               </Button>
               <Button type="submit" className="flex-1" disabled={isPending}>
-                {isPending ? "Creating..." : isLastStep ? "Create account" : "Continue"}
+                {submitLabel}
               </Button>
             </div>
           </form>

@@ -17,6 +17,29 @@ class InvitationRegistrationCreate(UserCreate):
     invitation_token: str
     profile: ProfileBase
 
+class CompanyInvitationCreate(BaseModel):
+    email: EmailStr
+    expires_in_days: int = Field(
+        default=7,
+        ge=1,
+        le=30,
+        description="Number of days before the invitation expires",
+    )
+
+class CompanyInvitationRead(BaseModel):
+    id: UUID
+    company_id: UUID
+    email: EmailStr
+    token: str
+    status: str
+    expires_at: datetime
+    invited_by_user_id: UUID
+    accepted_by_user_id: UUID | None = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
 class UserRead(BaseModel):
     id: UUID
     email: EmailStr

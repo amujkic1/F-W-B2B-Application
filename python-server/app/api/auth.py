@@ -1,9 +1,10 @@
+import secrets
 from datetime import timedelta, datetime, timezone
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from jose import JWTError, jwt
@@ -16,6 +17,7 @@ from app.core.security import (
     create_refresh_token,
     verify_refresh_token
 )
+from app.api.deps import get_current_user
 from app.db.database import get_db
 from app.models.company import Company
 from app.models.company_invitation import CompanyInvitation
@@ -26,6 +28,8 @@ from app.models.user import User
 from app.models.user_refresh_tokens import UserRefreshToken
 from app.schemas.token import Token
 from app.schemas.user import (
+    CompanyInvitationCreate,
+    CompanyInvitationRead,
     CompanyRegistrationCreate,
     InvitationRegistrationCreate,
     UserCreate,
@@ -60,6 +64,15 @@ async def ensure_company_references_exist(user_in: CompanyRegistrationCreate, db
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Company type does not exist",
             )
+
+async def generate_unique_invitation_token(db: AsyncSession) -> str:
+    while True:
+        token = secrets.token_urlsafe(32)
+        result = await db.execute(
+            select(CompanyInvitation.id).where(CompanyInvitation.token == token)
+        )
+        if result.scalar_one_or_none() is None:
+            return token
 
 @router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 async def register(
@@ -114,6 +127,62 @@ async def register_company(
     await db.refresh(user)
 
     return user
+
+@router.post("/invitations", response_model=CompanyInvitationRead, status_code=status.HTTP_201_CREATED)
+async def create_company_invitation(
+    invitation_in: CompanyInvitationCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> Any:
+    if current_user.company_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You must belong to a company to invite users",
+        )
+
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only company admins can invite users",
+        )
+
+    await ensure_email_available(invitation_in.email, db)
+
+    email = invitation_in.email.lower()
+    now = datetime.now(timezone.utc)
+
+    result = await db.execute(
+        select(CompanyInvitation).where(
+            CompanyInvitation.company_id == current_user.company_id,
+            func.lower(CompanyInvitation.email) == email,
+            CompanyInvitation.status == "pending",
+        )
+    )
+    existing_invitation = result.scalars().first()
+
+    if existing_invitation is not None:
+        expires_at = existing_invitation.expires_at
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+
+        if expires_at >= now:
+            return existing_invitation
+
+        existing_invitation.status = "expired"
+
+    invitation = CompanyInvitation(
+        company_id=current_user.company_id,
+        email=email,
+        token=await generate_unique_invitation_token(db),
+        expires_at=now + timedelta(days=invitation_in.expires_in_days),
+        invited_by_user_id=current_user.id,
+    )
+
+    db.add(invitation)
+    await db.commit()
+    await db.refresh(invitation)
+
+    return invitation
 
 @router.post("/register/invitation", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 async def register_with_invitation(
