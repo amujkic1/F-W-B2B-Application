@@ -44,3 +44,13 @@ class User(Base):
         cascade="all, delete-orphan",
     )
     company: Mapped["Company | None"] = relationship("Company", back_populates="users")
+    sent_company_invitations: Mapped[list["CompanyInvitation"]] = relationship(
+        "CompanyInvitation",
+        foreign_keys="CompanyInvitation.invited_by_user_id",
+        back_populates="invited_by_user",
+    )
+    accepted_company_invitations: Mapped[list["CompanyInvitation"]] = relationship(
+        "CompanyInvitation",
+        foreign_keys="CompanyInvitation.accepted_by_user_id",
+        back_populates="accepted_by_user",
+    )

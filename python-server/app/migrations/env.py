@@ -10,6 +10,7 @@ from app.models.user import User
 from app.models.profile import Profile
 from app.models.availability import Availability
 from app.models.company import Company
+from app.models.company_invitation import CompanyInvitation
 from app.models.company_type import CompanyType
 from app.models.industry import Industry
 from app.models.meeting_request import MeetingRequest
