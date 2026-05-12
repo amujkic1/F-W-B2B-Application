@@ -35,10 +35,10 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(meeting_request_router, dependencies=[Depends(get_current_user)])
 app.include_router(profile_router, dependencies=[Depends(get_current_user)])
-app.include_router(industry_router, dependencies=[Depends(get_current_user)])
+app.include_router(industry_router)
 app.include_router(unavailable_period_router, dependencies=[Depends(get_current_user)])
 app.include_router(company_router, dependencies=[Depends(get_current_user)])
-app.include_router(company_type_router, dependencies=[Depends(get_current_user)])
+app.include_router(company_type_router)
 
 @app.get("/info", dependencies=[Depends(get_current_user)])
 def get_info():
