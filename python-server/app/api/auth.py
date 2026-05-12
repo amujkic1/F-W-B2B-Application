@@ -1,20 +1,18 @@
 from datetime import timedelta, datetime, timezone
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from jose import JWTError, jwt
 
-from app.services.email import send_verification_email
 from app.core.config import settings
 from app.core.security import (
     create_access_token, 
     hash_password, 
     verify_password, 
-    create_verification_token,
     create_refresh_token,
     verify_refresh_token
 )
@@ -29,7 +27,6 @@ router = APIRouter(prefix="/api/auth", tags=["authentication"])
 @router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 async def register(
     user_in: UserCreate, 
-    background_tasks: BackgroundTasks, 
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     # Use await and select()
@@ -50,9 +47,6 @@ async def register(
     db.add(user)
     await db.commit()
     await db.refresh(user)
-
-    token = create_verification_token(user.email)
-    background_tasks.add_task(send_verification_email, user.email, token)
 
     return user
 
