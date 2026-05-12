@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { useRegisterMutation } from "@/queries/useAuth.js";
+import { useCompanyTypes } from "@/queries/useCompanyTypes.js";
+import { useIndustries } from "@/queries/useIndustries.js";
 import { Button, buttonVariants } from "@/components/ui/button.jsx";
 import {
   Card,
@@ -13,10 +15,38 @@ import {
 } from "@/components/ui/card.jsx";
 import { Input } from "@/components/ui/input.jsx";
 import { Label } from "@/components/ui/label.jsx";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select.jsx";
+
+const COMPANY_SIZE_OPTIONS = ["1-10", "11-50", "51-200", "201+"];
+
+function splitFullName(fullName) {
+  const parts = fullName.trim().split(/\s+/);
+  const firstName = parts.shift() || "";
+  const lastName = parts.join(" ");
+
+  return {
+    firstName,
+    lastName: lastName || firstName,
+  };
+}
+
+function getItems(data) {
+  return Array.isArray(data) ? data : data?.items || [];
+}
 
 export function RegistrationPage() {
   const [companyName, setCompanyName] = useState("");
   const [fullName, setFullName] = useState("");
+  const [position, setPosition] = useState("");
+  const [companySize, setCompanySize] = useState("");
+  const [industryId, setIndustryId] = useState("");
+  const [companyTypeId, setCompanyTypeId] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -25,7 +55,11 @@ export function RegistrationPage() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const registerMutation = useRegisterMutation();
+  const industriesQuery = useIndustries({ limit: 100 });
+  const companyTypesQuery = useCompanyTypes({ limit: 100 });
   const isPending = registerMutation.isPending;
+  const industries = getItems(industriesQuery.data);
+  const companyTypes = getItems(companyTypesQuery.data);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -35,6 +69,8 @@ export function RegistrationPage() {
     if (
       !companyName.trim() ||
       !fullName.trim() ||
+      !position.trim() ||
+      !companySize ||
       !email.trim() ||
       !password.trim()
     ) {
@@ -62,13 +98,33 @@ export function RegistrationPage() {
       return;
     }
 
+    const { firstName, lastName } = splitFullName(fullName);
+
     registerMutation.mutate(
-      { email, password },
+      {
+        email,
+        password,
+        profile: {
+          first_name: firstName,
+          last_name: lastName,
+          position,
+        },
+        company: {
+          company_name: companyName,
+          company_size: companySize,
+          industry_id: industryId || null,
+          company_type_id: companyTypeId || null,
+        },
+      },
       {
         onSuccess: () => {
           setMessage("Registration successful. You can sign in now.");
           setCompanyName("");
           setFullName("");
+          setPosition("");
+          setCompanySize("");
+          setIndustryId("");
+          setCompanyTypeId("");
           setEmail("");
           setPassword("");
           setConfirmPassword("");
@@ -126,6 +182,74 @@ export function RegistrationPage() {
                   onChange={(event) => setFullName(event.target.value)}
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="position">Position</Label>
+                <Input
+                  id="position"
+                  type="text"
+                  placeholder="Founder, CEO..."
+                  value={position}
+                  onChange={(event) => setPosition(event.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="companySize">Company size</Label>
+                <Select value={companySize} onValueChange={setCompanySize}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select size" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {COMPANY_SIZE_OPTIONS.map((size) => (
+                      <SelectItem key={size} value={size}>
+                        {size}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="industry">Industry</Label>
+                <Select
+                  value={industryId}
+                  onValueChange={setIndustryId}
+                  disabled={industriesQuery.isLoading}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={industriesQuery.isLoading ? "Loading..." : "Optional"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {industries.map((industry) => (
+                      <SelectItem key={industry.id} value={industry.id}>
+                        {industry.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="companyType">Company type</Label>
+                <Select
+                  value={companyTypeId}
+                  onValueChange={setCompanyTypeId}
+                  disabled={companyTypesQuery.isLoading}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={companyTypesQuery.isLoading ? "Loading..." : "Optional"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {companyTypes.map((companyType) => (
+                      <SelectItem key={companyType.id} value={companyType.id}>
+                        {companyType.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2 sm:col-span-2">

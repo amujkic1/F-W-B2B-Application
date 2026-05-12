@@ -20,7 +20,7 @@ export function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const fromPath = location.state?.from?.pathname || "/dashboard";
+  const fromPath = location.state?.from?.pathname || "/matchmaking";
   const fromSearch = location.state?.from?.search || "";
   const fromHash = location.state?.from?.hash || "";
 

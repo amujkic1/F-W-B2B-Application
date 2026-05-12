@@ -21,6 +21,8 @@ class UserRead(BaseModel):
     id: UUID
     email: EmailStr
     status: str
+    company_id: UUID | None = None
+    role: str | None = None
     created_at: datetime
     email_verified_at: datetime | None = None
 
@@ -39,6 +41,8 @@ class UserProfileSummary(BaseModel):
 class UserLoginData(BaseModel):
     id: UUID
     email: EmailStr
+    company_id: UUID | None = None
+    role: str | None = None
     profile: UserProfileSummary | None = None
 
     class Config:

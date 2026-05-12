@@ -17,27 +17,56 @@ from app.core.security import (
     verify_refresh_token
 )
 from app.db.database import get_db
+from app.models.company import Company
+from app.models.company_invitation import CompanyInvitation
+from app.models.company_type import CompanyType
+from app.models.industry import Industry
+from app.models.profile import Profile
 from app.models.user import User
 from app.models.user_refresh_tokens import UserRefreshToken
 from app.schemas.token import Token
-from app.schemas.user import UserCreate, UserRead
+from app.schemas.user import (
+    CompanyRegistrationCreate,
+    InvitationRegistrationCreate,
+    UserCreate,
+    UserRead,
+)
 
 router = APIRouter(prefix="/api/auth", tags=["authentication"])
+
+async def ensure_email_available(email: str, db: AsyncSession) -> None:
+    result = await db.execute(select(User).where(User.email == email))
+    existing_user = result.scalars().first()
+
+    if existing_user is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email is already registered",
+        )
+
+async def ensure_company_references_exist(user_in: CompanyRegistrationCreate, db: AsyncSession) -> None:
+    if user_in.company.industry_id is not None:
+        result = await db.execute(select(Industry.id).where(Industry.id == user_in.company.industry_id))
+        if result.scalar_one_or_none() is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Industry does not exist",
+            )
+
+    if user_in.company.company_type_id is not None:
+        result = await db.execute(select(CompanyType.id).where(CompanyType.id == user_in.company.company_type_id))
+        if result.scalar_one_or_none() is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Company type does not exist",
+            )
 
 @router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 async def register(
     user_in: UserCreate, 
     db: AsyncSession = Depends(get_db)
 ) -> Any:
-    # Use await and select()
-    result = await db.execute(select(User).where(User.email == user_in.email))
-    existing_user = result.scalars().first()
-    
-    if existing_user is not None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email is already registered",
-        )
+    await ensure_email_available(user_in.email, db)
 
     user = User(
         email=user_in.email,
@@ -45,6 +74,107 @@ async def register(
     )
     
     db.add(user)
+    await db.commit()
+    await db.refresh(user)
+
+    return user
+
+@router.post("/register/company", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+async def register_company(
+    user_in: CompanyRegistrationCreate,
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    await ensure_email_available(user_in.email, db)
+    await ensure_company_references_exist(user_in, db)
+
+    user = User(
+        email=user_in.email,
+        password_hash=hash_password(user_in.password),
+        role="admin",
+    )
+    db.add(user)
+    await db.flush()
+
+    profile = Profile(
+        **user_in.profile.model_dump(),
+        user_id=user.id,
+    )
+    db.add(profile)
+    await db.flush()
+
+    company = Company(
+        **user_in.company.model_dump(),
+        profile_id=profile.id,
+    )
+    db.add(company)
+    await db.flush()
+
+    user.company_id = company.id
+    await db.commit()
+    await db.refresh(user)
+
+    return user
+
+@router.post("/register/invitation", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+async def register_with_invitation(
+    user_in: InvitationRegistrationCreate,
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    await ensure_email_available(user_in.email, db)
+
+    result = await db.execute(
+        select(CompanyInvitation).where(CompanyInvitation.token == user_in.invitation_token)
+    )
+    invitation = result.scalars().first()
+
+    if invitation is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid invitation token",
+        )
+
+    if invitation.status != "pending":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invitation is not pending",
+        )
+
+    expires_at = invitation.expires_at
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+
+    if expires_at < datetime.now(timezone.utc):
+        invitation.status = "expired"
+        await db.commit()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invitation has expired",
+        )
+
+    if invitation.email.lower() != user_in.email.lower():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invitation email does not match registration email",
+        )
+
+    user = User(
+        email=user_in.email,
+        password_hash=hash_password(user_in.password),
+        company_id=invitation.company_id,
+        role="member",
+    )
+    db.add(user)
+    await db.flush()
+
+    profile = Profile(
+        **user_in.profile.model_dump(),
+        user_id=user.id,
+    )
+    db.add(profile)
+
+    invitation.status = "accepted"
+    invitation.accepted_by_user_id = user.id
+
     await db.commit()
     await db.refresh(user)
 
@@ -91,32 +221,6 @@ async def login(
         "token_type": "bearer",
         "user": user 
     }
-
-@router.get("/verify-email")
-async def verify_email(token: str, db: AsyncSession = Depends(get_db)):
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        email = payload.get("sub")
-        
-        if payload.get("type") != "verification":
-            raise HTTPException(status_code=400, detail="Invalid token type")
-            
-        result = await db.execute(select(User).where(User.email == email))
-        user = result.scalars().first()
-        
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-        
-        if user.is_verified:
-            return {"msg": "Email je već ranije verifikovan."}
-
-        user.is_verified = True
-        await db.commit()
-        
-        return {"msg": "Uspješno ste verifikovali email! Sada se možete ulogovati."}
-        
-    except JWTError:
-        raise HTTPException(status_code=400, detail="Link je neispravan ili je istekao.")
 
 @router.post("/refresh", response_model=Token)
 async def refresh(

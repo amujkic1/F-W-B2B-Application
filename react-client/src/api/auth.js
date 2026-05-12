@@ -1,12 +1,8 @@
 import { authClient } from './authClient'
 
-export async function registerUser({ email, password }) {
+export async function registerUser(registration) {
   try {
-    const response = await authClient.post('/api/auth/register', {
-      email,
-      password,
-      account_type: 'company',
-    })
+    const response = await authClient.post('/api/auth/register/company', registration)
     return response.data
   } catch (error) {
     if (error.response) {
