@@ -12,13 +12,13 @@ export async function registerUser({ email, password }) {
     if (error.response) {
       throw {
         status: error.response.status,
-        message: error.response.data?.detail || error.response.data?.message || 'Registracija nije uspješna',
+        message: error.response.data?.detail || error.response.data?.message || 'Registration was not successful',
         data: error.response.data,
       }
     }
     throw {
       status: 0,
-      message: error.message || 'Greška u konekciji sa serverom',
+      message: error.message || 'Could not connect to the server',
       data: null,
     }
   }
@@ -26,9 +26,9 @@ export async function registerUser({ email, password }) {
 
 export async function loginUser({ email, password }) {
   try {
-    // 1. Priprema podataka u URL-encoded formatu (OAuth2 standard)
+    // 1. Prepare data in URL-encoded format (OAuth2 standard)
     const params = new URLSearchParams();
-    params.append('username', email); // FastAPI OAuth2 helper traži 'username'
+    params.append('username', email); // FastAPI OAuth2 helper expects 'username'
     params.append('password', password);
 
     const response = await authClient.post('/api/auth/login', params, {
@@ -44,12 +44,12 @@ export async function loginUser({ email, password }) {
     if (error.response) {
       throw {
         status: error.response.status,
-        message: error.response.data?.detail || 'Prijava nije uspela',
+        message: error.response.data?.detail || 'Sign-in was not successful',
       };
     }
     throw {
       status: 0,
-      message: 'Greška u komunikaciji sa serverom',
+      message: 'Could not communicate with the server',
     };
   }
 }

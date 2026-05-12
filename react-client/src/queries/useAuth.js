@@ -19,10 +19,10 @@ export function useRegisterMutation() {
   return useMutation({
     mutationFn: registerUser,
     onSuccess: (data) => {
-      console.log('Registracija uspješna:', data)
+      console.log('Registration successful:', data)
     },
     onError: (error) => {
-      console.error('Greška pri registraciji:', error.message)
+      console.error('Registration error:', error.message)
     },
   })
 }
@@ -43,7 +43,7 @@ export function useLoginMutation() {
         setUser(data.user);
     },
     onError: (error) => {
-      console.error('Greška pri prijavi:', error.message)
+      console.error('Sign-in error:', error.message)
     },
   })
 }

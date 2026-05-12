@@ -38,27 +38,27 @@ export function RegistrationPage() {
       !email.trim() ||
       !password.trim()
     ) {
-      setErrorMessage("Popuni sva obavezna polja.");
+      setErrorMessage("Fill in all required fields.");
       return;
     }
 
     if (password.length < 8) {
-      setErrorMessage("Password mora imati najmanje 8 karaktera.");
+      setErrorMessage("Password must be at least 8 characters long.");
       return;
     }
 
     if (password.length > 50) {
-      setErrorMessage("Password ne smije biti duži od 50 karaktera.");
+      setErrorMessage("Password cannot be longer than 50 characters.");
       return;
     }
 
     if (password !== confirmPassword) {
-      setErrorMessage("Password i potvrda passworda se ne podudaraju.");
+      setErrorMessage("Password and confirmation password do not match.");
       return;
     }
 
     if (!termsAccepted) {
-      setErrorMessage("Moraš prihvatiti uslove korištenja.");
+      setErrorMessage("You must accept the terms of use.");
       return;
     }
 
@@ -66,7 +66,7 @@ export function RegistrationPage() {
       { email, password },
       {
         onSuccess: () => {
-          setMessage("Registracija uspješna. Možeš se prijaviti.");
+          setMessage("Registration successful. You can sign in now.");
           setCompanyName("");
           setFullName("");
           setEmail("");
@@ -94,9 +94,9 @@ export function RegistrationPage() {
             <span className="section-label text-accent">Create account</span>
           </div>
           <div className="space-y-2">
-            <CardTitle className="text-3xl md:text-4xl">Registracija</CardTitle>
+            <CardTitle className="text-3xl md:text-4xl">Registration</CardTitle>
             <CardDescription>
-              Kreiraj B2B račun i započni povezivanje s partnerima.
+              Create a B2B account and start connecting with partners.
             </CardDescription>
           </div>
         </CardHeader>
@@ -105,11 +105,11 @@ export function RegistrationPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="companyName">Naziv firme</Label>
+                <Label htmlFor="companyName">Company name</Label>
                 <Input
                   id="companyName"
                   type="text"
-                  placeholder="Primjer d.o.o."
+                  placeholder="Example Ltd."
                   value={companyName}
                   onChange={(event) => setCompanyName(event.target.value)}
                   required
@@ -117,11 +117,11 @@ export function RegistrationPage() {
               </div>
 
               <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="fullName">Ime i prezime</Label>
+                <Label htmlFor="fullName">Full name</Label>
                 <Input
                   id="fullName"
                   type="text"
-                  placeholder="Ime Prezime"
+                  placeholder="First Last"
                   value={fullName}
                   onChange={(event) => setFullName(event.target.value)}
                   required
@@ -129,12 +129,12 @@ export function RegistrationPage() {
               </div>
 
               <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="registerEmail">Poslovni email</Label>
+                <Label htmlFor="registerEmail">Business email</Label>
                 <Input
                   id="registerEmail"
                   type="email"
                   autoComplete="email"
-                  placeholder="ime@firma.com"
+                  placeholder="name@company.com"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   required
@@ -147,7 +147,7 @@ export function RegistrationPage() {
                   id="registerPassword"
                   type="password"
                   autoComplete="new-password"
-                  placeholder="8-50 karaktera"
+                  placeholder="8-50 characters"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   required
@@ -155,12 +155,12 @@ export function RegistrationPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Potvrdi password</Label>
+                <Label htmlFor="confirmPassword">Confirm password</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
                   autoComplete="new-password"
-                  placeholder="Ponovi password"
+                  placeholder="Repeat password"
                   value={confirmPassword}
                   onChange={(event) => setConfirmPassword(event.target.value)}
                   required
@@ -175,11 +175,11 @@ export function RegistrationPage() {
                 checked={termsAccepted}
                 onChange={(event) => setTermsAccepted(event.target.checked)}
               />
-              Prihvatam uslove korištenja
+              I accept the terms of use
             </label>
 
             <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? "Kreiranje računa..." : "Kreiraj račun"}
+              {isPending ? "Creating account..." : "Create account"}
             </Button>
           </form>
         </CardContent>
@@ -190,7 +190,7 @@ export function RegistrationPage() {
           )}
           <p className="text-sm text-muted-foreground">{message || " "}</p>
           <p className="text-sm text-muted-foreground">
-            Već imaš račun?{" "}
+            Already have an account?{" "}
             <Link
               to="/login"
               className={buttonVariants({
@@ -198,7 +198,7 @@ export function RegistrationPage() {
                 className: "h-auto p-0",
               })}
             >
-              Prijavi se
+              Sign in
             </Link>
           </p>
         </CardFooter>
