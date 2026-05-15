@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "B2B App"
     ENVIRONMENT: str = "development"
     BACKEND_URL: str = "http://localhost:8000"
-    FRONTEND_URL: str = "http://localhost:5173"
+    FRONTEND_URL: str = "https://b2bhub-fe.onrender.com/"
     CORS_ORIGINS: str = ""
     MAIL_USERNAME: str = ""
     MAIL_PASSWORD: str = ""
