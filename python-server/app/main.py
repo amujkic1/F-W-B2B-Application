@@ -1,7 +1,6 @@
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.db.database import engine, Base
 from app.models.user import User
 from app.models.profile import Profile
 from app.models.industry import Industry
@@ -20,19 +19,12 @@ from app.api.industry import router as industry_router
 from app.api.company_type import router as company_type_router
 from app.api.unavailable_period import router as unavailable_period_router
 from app.api.deps import get_current_user
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-FRONTEND_URL = os.getenv("FRONTEND_URL")
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
-# CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", FRONTEND_URL],
+    allow_origins=settings.allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -45,6 +37,18 @@ app.include_router(industry_router)
 app.include_router(unavailable_period_router, dependencies=[Depends(get_current_user)])
 app.include_router(company_router, dependencies=[Depends(get_current_user)])
 app.include_router(company_type_router)
+
+@app.get("/")
+def root():
+    return {
+        "app_name": settings.PROJECT_NAME,
+        "environment": settings.ENVIRONMENT,
+        "status": "ok",
+    }
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 @app.get("/info", dependencies=[Depends(get_current_user)])
 def get_info():
