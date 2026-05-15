@@ -286,6 +286,8 @@ async def login(
     )
     db.add(db_refresh_token)
     await db.commit()
+
+    await notify_slack(f"🚀 *New User Registered*: {user.email}")
     
     return {
         "access_token": access_token,
