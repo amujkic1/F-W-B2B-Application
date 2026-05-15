@@ -13,7 +13,11 @@ conf = ConnectionConfig(
 )
 
 async def send_verification_email(email: str, token: str):
-    verification_url = f"http://localhost:8000/api/auth/verify-email?token={token}"
+    if not settings.MAIL_SERVER:
+        raise RuntimeError("Email is not configured. Set MAIL_SERVER and related MAIL_* variables.")
+
+    backend_url = settings.BACKEND_URL.rstrip("/")
+    verification_url = f"{backend_url}/api/auth/verify-email?token={token}"
     
     html = f"""
     <html>

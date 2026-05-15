@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: b2bhub-be
+    runtime: python
+    rootDir: python-server
+    buildCommand: pip install -r requirements.txt
+    startCommand: bash start.sh
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.13
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 30
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: 7
+      - key: ENVIRONMENT
+        value: production
+      - key: BACKEND_URL
+        value: https://b2bhub-be.onrender.com
+      - key: FRONTEND_URL
+        value: https://b2bhub-fe.onrender.com
+      - key: CORS_ORIGINS
+        value: https://b2bhub-fe.onrender.com
+
+  - type: web
+    name: b2bhub-fe
+    runtime: static
+    rootDir: react-client
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://b2bhub-be.onrender.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
