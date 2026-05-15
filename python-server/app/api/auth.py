@@ -35,6 +35,7 @@ from app.schemas.user import (
     UserCreate,
     UserRead,
 )
+from app.utils.slack import notify_slack
 
 router = APIRouter(prefix="/api/auth", tags=["authentication"])
 
@@ -89,6 +90,8 @@ async def register(
     db.add(user)
     await db.commit()
     await db.refresh(user)
+
+    await notify_slack(f"🚀 *New User Registered*: {user.email}")
 
     return user
 
